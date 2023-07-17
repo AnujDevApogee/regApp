@@ -1,0 +1,47 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">NAVIK200 &amp; 50 Registration</string>
+
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="title_activity_device_control">DeviceControlActivity</string>
+
+
+    <string name="zero">0</string>
+    <string name="ok">oK</string>
+    <string name="data_inserted">Data inserted</string>
+    <string name="failed_fetching_data">Failed! fetching data</string>
+    <string name="fetching_data_from_server">Fetching Data from server</string>
+    <string name="getting_id_password">Getting Id and Password....</string>
+    <string name="data_getting_from_server">Data getting from Server</string>
+    <string name="your_connection_request_">Your connection request sucessfully</string>
+    <string name="your_connection_request_fail">Your connection request fail ! Retry again click on connect button</string>
+    <string name="selected">Selected:</string>
+    <string name="command_write_successfully">command write successfully</string>
+    <string name="command_write_fail_click_on_resend_button_for_resend_command">command write fail click on resend button for resend command</string>
+    <string name="here">Here</string>
+    <string name="more_command_for_sending_next_command_click_on_send_button">more command For sending next command click on send button</string>
+    <string name="not">Not</string>
+    <string name="authorised">Authorised</string>
+    <string name="total">total:</string>
+    <string name="no_internet_connetion">No internet Connection</string>
+    <string name="please_turn_on_internet_connection_to_continue">Please turn on internet connection to continue</string>
+    <string name="permission_granted">Permission Granted</string>
+    <string name="permission_denied">Permission Denied</string>
+    <string name="data_selection_detail">Data Selection Detail</string>
+    <string name="manufacturer_name">Manufacturer Name</string>
+    <string name="device_type">Device_type</string>
+    <string name="model_name">Model_name</string>
+    <string name="model_number">Model_no.</string>
+    <string name="log_speed">Log Speed</string>
+    <string name="minutes">Minutes</string>
+    <string name="device_name" tools:ignore="ExtraTranslation">Device Name</string>
+    <string name="pairing_request">PAIRING requested\n-> Perform pairing steps. Connect again</string>
+    <string name="header">Header</string>
+    <string name="are_you_want_to_add_category">Are you want to add category?</string>
+    <string name="continue1">Continue</string>
+    <string name="no">NO</string>
+    <string name="location">Location!</string>
+    <string name="location_not_enabled">Location not enabled</string>
+    <string name="open_setting">Open setting</string>
+    <string name="cancel">Cancel</string>
+</resources>

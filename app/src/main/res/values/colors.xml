@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+ <resources xmlns:tools="http://schemas.android.com/tools">
+
+
+     <color name="colorPrimary">#EC938F</color>
+     <color name="colorPrimary1" tools:ignore="MissingDefaultResource">#FFF3D2D0</color>
+     <color name="colorPrimaryDark">#DF8783</color>
+     <color name="colorAccent">#FFD81B60</color>
+     <color name="colorWhite">#FFFFFF</color>
+     <color name="coloret">#FFE4E1E1</color>
+     <color name="textColorPrimary">#FF000000</color>
+     <color name="white">#FFFFFFFF</color>
+     <color name="btn_logut_bg">#FFFF6861</color>
+     <color name="colorblue">#2141A8</color>
+     <color name="coloryellow">#FFF3E153</color>
+    <color name="black">#000000</color>
+
+
+
+  </resources>

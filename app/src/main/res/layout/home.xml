@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/coloret"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:id="@+id/llDeviceRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="2">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvDeviceRegister"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="20dp"
+                app:contentPadding="10dp">
+
+                <TextView
+                    style="@style/Base.CardView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/circle"
+                    android:gravity="center"
+                    android:text="Device Registration"
+                    android:textSize="@dimen/_15ssp" />
+
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvDeviceConfiguration"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/cvDeviceRegister"
+                android:layout_weight="1"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="20dp"
+                app:contentPadding="10dp">
+
+                <TextView
+                    style="@style/Base.CardView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/circle"
+                    android:gravity="center"
+                    android:text="Device Configuration"
+                    android:textSize="@dimen/_15ssp" />
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/l2DeviceRegister"
+            android:layout_width="match_parent"
+            android:layout_below="@+id/llDeviceRegister"
+            android:layout_height="wrap_content"
+            android:weightSum="2">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/svdlist"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="10dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="20dp"
+                app:contentPadding="10dp">
+
+                <TextView
+                    style="@style/Base.CardView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/circle"
+                    android:gravity="center"
+                    android:text="Saved Device    List"
+                    android:textSize="@dimen/_15ssp" />
+
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/ipport"
+                android:layout_width="0dp"
+                android:layout_height="150dp"
+                android:layout_margin="10dp"
+                android:layout_toEndOf="@+id/cvDeviceRegister"
+                android:layout_weight="1"
+                app:cardCornerRadius="30dp"
+                app:cardElevation="20dp"
+                app:contentPadding="10dp">
+
+                <TextView
+                    style="@style/Base.CardView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/circle"
+                    android:gravity="center"
+                    android:text="Change IP/Port"
+                    android:textSize="@dimen/_15ssp" />
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+
+    </RelativeLayout>
+</layout>

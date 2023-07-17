@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+     <androidx.cardview.widget.CardView
+           android:id="@+id/card_view"
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:layout_margin="@dimen/five_dp"
+           android:background="@android:color/white"
+           android:elevation="@dimen/eight_dp">
+
+           <LinearLayout
+               android:layout_width="wrap_content"
+               android:layout_height="wrap_content"
+               android:orientation="vertical">
+
+               <TextView
+                   android:id="@+id/device_name"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginStart="@dimen/ten_dp"
+                   android:gravity="center_vertical"
+                   android:text="Realme-3"
+                   android:textColor="@color/black"
+                   android:textSize="@dimen/eighteen_sp" />
+
+               <TextView
+                   android:id="@+id/device_address"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   android:layout_marginLeft="@dimen/ten_dp"
+                   android:text="192.23.12" />
+           </LinearLayout>
+       </androidx.cardview.widget.CardView>
+</layout>
