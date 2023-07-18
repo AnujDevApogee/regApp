@@ -1,0 +1,8 @@
+R_DEF: Internal format may change without notice
+local
+id progressBar
+id progressDialogLayout
+id progressLayout
+id txtFeedBack
+id txtProgressbarPercent
+layout layout_progress_dialog
