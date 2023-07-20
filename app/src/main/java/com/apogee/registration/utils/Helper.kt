@@ -9,6 +9,10 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 
 
+object ApiUrl{
+    val loginUrl=Pair("",1)
+}
+
 fun View.hide() {
     this.isVisible = false
 }
