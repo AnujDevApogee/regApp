@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">registration</string>
+    <string name="usr_nm">UserName</string>
+    <string name="pass">Password</string>
+    <string name="logn">Login</string>
+    <string name="rem_btn">Remember Me</string>
 </resources>
