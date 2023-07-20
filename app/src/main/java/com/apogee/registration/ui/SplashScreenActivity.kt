@@ -1,4 +1,4 @@
-package com.apogee.registration
+package com.apogee.registration.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
