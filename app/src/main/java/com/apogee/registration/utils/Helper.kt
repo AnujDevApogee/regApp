@@ -2,6 +2,7 @@ package com.apogee.registration.utils
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
@@ -29,6 +30,15 @@ fun Activity.closeKeyboard(view: View) {
     this.window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN)
 }
 
+
+inline fun <reified T> Activity.goToNextActivity(isRemoveBckStg: Boolean = false) {
+    Intent(this, T::class.java).also {
+        startActivity(it)
+        if (isRemoveBckStg) {
+            this.finishAffinity()
+        }
+    }
+}
 
 fun Activity.openKeyBoard(view: View) {
     val imm =
