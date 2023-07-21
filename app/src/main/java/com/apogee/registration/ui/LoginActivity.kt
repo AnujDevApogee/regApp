@@ -16,7 +16,7 @@ class LoginActivity : AppCompatActivity() {
         binding = LoginActivityLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
         openKeyBoard(binding.userNm)
-        binding.loginBtn.setOnClickListener{
+        binding.loginBtn.setOnClickListener {
             goToNextActivity<DashBoardActivity>(true)
         }
     }
