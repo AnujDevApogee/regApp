@@ -1,10 +1,14 @@
 package com.apogee.registration.repository
 
+import android.content.Context
 import com.apogee.apilibrary.Interfaces.CustomCallback
+import com.apogee.registration.datastore.RegistrationAppSharedPref
 import com.apogee.registration.instance.ApiInstance
 import com.apogee.registration.model.LoginRequest
+import com.apogee.registration.model.LoginResponse
 import com.apogee.registration.utils.ApiUrl
 import com.apogee.registration.utils.DataResponse
+import com.apogee.registration.utils.deserializeFromJson
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,8 +18,12 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 
-class LoginRepository : CustomCallback {
+class LoginRepository(context: Context) : CustomCallback {
 
+
+    private val loginSharePref by lazy {
+        RegistrationAppSharedPref.getInstance(context)
+    }
 
     private val _loginResponse =
         MutableStateFlow<DataResponse<out Any?>>(DataResponse.Loading(null))
@@ -61,8 +69,12 @@ class LoginRepository : CustomCallback {
                     if (requestBody != null) {
 
                         try {
-                            val responseString = requestBody.string()
-                            _loginResponse.value = DataResponse.Success(responseString)
+                            val loginResponse =
+                                deserializeFromJson<LoginResponse>(requestBody.string())
+                            loginSharePref.saveLoginResponse(loginResponse!!)
+                            _loginResponse.value = DataResponse.Success(
+                                loginResponse
+                            )
                         } catch (e: Exception) {
                             _loginResponse.value = DataResponse.Error(null, e)
                         }
