@@ -111,6 +111,21 @@
                 app:layout_constraintRight_toRightOf="@id/pass_word_layout"
                 app:layout_constraintTop_toBottomOf="@id/remember_me" />
 
+
+            <com.google.android.material.progressindicator.CircularProgressIndicator
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                app:trackCornerRadius="10dp"
+                android:id="@+id/pb"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="@id/login_btn"
+                app:layout_constraintRight_toRightOf="@id/login_btn"
+                app:layout_constraintBottom_toBottomOf="@id/login_btn"
+                app:layout_constraintLeft_toLeftOf="@id/login_btn"
+                />
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 

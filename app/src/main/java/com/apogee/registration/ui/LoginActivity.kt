@@ -3,11 +3,14 @@ package com.apogee.registration.ui
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.apogee.registration.databinding.LoginActivityLayoutBinding
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.closeKeyboard
 import com.apogee.registration.utils.createLog
+import com.apogee.registration.utils.invisible
 import com.apogee.registration.utils.openKeyBoard
+import com.apogee.registration.utils.show
 import com.apogee.registration.viewmodel.LoginViewModel
 
 class LoginActivity : AppCompatActivity() {
@@ -43,21 +46,37 @@ class LoginActivity : AppCompatActivity() {
             when (it) {
                 is DataResponse.Error -> {
                     createLog(
-                        "LOGIN_RES",
-                        "Error ${it.data} and Exp ${it.exception?.localizedMessage}"
+                        "LOGIN_RES", "Error ${it.data} and Exp ${it.exception?.localizedMessage}"
                     )
+                    hidePb()
                 }
 
                 is DataResponse.Loading -> {
-                    createLog("LOGIN_RES", "Loading ${it.data}")
+                    it.data?.let {
+                        showPb()
+                    }
                 }
 
                 is DataResponse.Success -> {
                     createLog("LOGIN_RES", "Success ${it.data}")
+                    hidePb()
                 }
             }
         }
     }
+
+    private fun hidePb() {
+        binding.loginBtn.show()
+        binding.pb.isVisible=false
+    }
+
+    private fun showPb() {
+        binding.pb.isVisible = true
+        binding.loginBtn.invisible()
+    }
+
+
+
 
     override fun onPause() {
         super.onPause()

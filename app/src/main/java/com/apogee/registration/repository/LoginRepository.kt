@@ -6,6 +6,7 @@ import com.apogee.registration.model.LoginRequest
 import com.apogee.registration.utils.ApiUrl
 import com.apogee.registration.utils.DataResponse
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -34,6 +35,7 @@ class LoginRepository : CustomCallback {
         coroutine.launch {
             try {
                 _loginResponse.value = DataResponse.Loading("Please Wait")
+                delay(20000)
                 api.postDataWithBody(
                     loginRequest.setJsonObject(),
                     this@LoginRepository,
