@@ -2,6 +2,7 @@ package com.apogee.registration.repository
 
 import com.apogee.apilibrary.Interfaces.CustomCallback
 import com.apogee.registration.instance.ApiInstance
+import com.apogee.registration.model.LoginRequest
 import com.apogee.registration.utils.ApiUrl
 import com.apogee.registration.utils.DataResponse
 import kotlinx.coroutines.cancel
@@ -15,7 +16,8 @@ import retrofit2.Response
 class LoginRepository : CustomCallback {
 
 
-    private val _loginResponse = MutableStateFlow<DataResponse<out Any?>>(DataResponse.Loading("Please wait.."))
+    private val _loginResponse =
+        MutableStateFlow<DataResponse<out Any?>>(DataResponse.Loading(null))
     val loginResponse: StateFlow<DataResponse<out Any?>>
         get() = _loginResponse
 
@@ -28,15 +30,19 @@ class LoginRepository : CustomCallback {
     }
 
 
-    fun validateUser() {
+    fun validateUser(loginRequest: LoginRequest) {
         coroutine.launch {
-            _loginResponse.value = DataResponse.Loading("Please wait..")
-            api.postDataWithBody(
-                "",
-                this@LoginRepository,
-                ApiUrl.loginUrl.first,
-                ApiUrl.loginUrl.second
-            )
+            try {
+                _loginResponse.value = DataResponse.Loading("Please Wait")
+                api.postDataWithBody(
+                    loginRequest.setJsonObject(),
+                    this@LoginRepository,
+                    ApiUrl.loginUrl.first,
+                    ApiUrl.loginUrl.second
+                )
+            } catch (e: Exception) {
+                _loginResponse.value = DataResponse.Error(null, e)
+            }
         }
     }
 
@@ -60,14 +66,14 @@ class LoginRepository : CustomCallback {
                         }
 
                     } else {
-                        null
+                        _loginResponse.value =
+                            DataResponse.Error("Cannot Process the Response", null)
                     }
 
                 } else {
                     _loginResponse.value = DataResponse.Error(it.toString(), null)
                 }
-                ""
-            } ?: {
+            } ?: run {
                 _loginResponse.value = DataResponse.Error("oops something went wrong", null)
             }
         }

@@ -3,14 +3,17 @@ package com.apogee.registration.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import com.google.gson.Gson
 
 
 object ApiUrl{
-    val loginUrl=Pair("",1)
+    val loginUrl=Pair("http://120.138.10.146:8080/login_module/api/getLoginPersonData/",1)
+    val loginProjectName="RegistrationCumAllotment"
 }
 
 fun View.hide() {
@@ -44,6 +47,10 @@ inline fun <reified T> Activity.goToNextActivity(isRemoveBckStg: Boolean = false
     }
 }
 
+fun createLog(tag:String,msg:String){
+    Log.i(tag, "createLog: $msg")
+}
+
 fun Activity.openKeyBoard(view: View) {
     val imm =
         getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
@@ -53,3 +60,16 @@ fun Activity.openKeyBoard(view: View) {
     )
     view.requestFocus()
 }
+
+fun <T> serializeToJson(bmp: T): String? {
+    val gson = Gson()
+    return gson.toJson(bmp)
+}
+
+
+inline fun <reified T> deserializeFromJson(jsonFile: String?): T? {
+    val gson = Gson()
+    return gson.fromJson(jsonFile, T::class.java)
+}
+
+fun checkVaildString(string: String?) = string.isNullOrEmpty() || string.isBlank() || string=="null"

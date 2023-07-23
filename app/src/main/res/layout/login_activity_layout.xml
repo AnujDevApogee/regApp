@@ -65,7 +65,7 @@
                 android:textColorHint="@color/md_theme_light_scrim"
                 app:boxStrokeColor="@color/md_theme_light_scrim"
                 app:boxStrokeWidthFocused="2dp"
-                app:endIconMode="clear_text"
+                app:endIconMode="password_toggle"
                 app:endIconTint="@color/md_theme_light_scrim"
                 app:hintTextColor="@color/md_theme_light_scrim"
                 app:layout_constraintLeft_toLeftOf="parent"
