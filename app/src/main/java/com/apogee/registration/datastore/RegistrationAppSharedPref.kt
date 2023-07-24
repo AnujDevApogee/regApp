@@ -59,4 +59,10 @@ class RegistrationAppSharedPref(private val context: Context) {
         return deserializeFromJson<LoginResponse>(sharedLoginPref.getString(loginResponse, "{}"))
     }
 
+    fun logout(): Boolean {
+        val edit=sharedLoginPref.edit()
+        edit.putString(loginResponse,null)
+        return edit.commit()
+    }
+
 }
