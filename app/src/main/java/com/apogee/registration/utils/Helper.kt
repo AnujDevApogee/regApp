@@ -116,6 +116,8 @@ fun NavController.safeNavigate(direction: NavDirections) {
 }
 
 
+fun getEmojiByUnicode(unicode: Int) = String(Character.toChars(unicode))
+
 fun NavController.safeNavigate(direction: Int) {
     currentDestination?.getAction(direction)?.run {
         navigate(direction)

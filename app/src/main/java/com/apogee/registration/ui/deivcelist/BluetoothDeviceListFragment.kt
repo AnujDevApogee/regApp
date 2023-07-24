@@ -16,7 +16,9 @@ import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.OnItemClickListener
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
+import com.apogee.registration.utils.hide
 import com.apogee.registration.utils.setUpDialogBox
+import com.apogee.registration.utils.show
 import com.apogee.registration.viewmodel.BleConnectionViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -67,6 +69,11 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
         )
         setupRecycleAdaptor()
         getBleDevice()
+        binding.swipeRefresh.setOnRefreshListener {
+            if (binding.swipeRefresh.isRefreshing){
+                viewModel.startConnection()
+            }
+        }
     }
 
     private fun setupRecycleAdaptor() {
@@ -96,18 +103,23 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
 
                 is DataResponse.Loading -> {
                     createLog("BLE_RES", " LOADING ${it.data} ")
-                    showPb()
+                    showPb((it.data as String?) ?: "")
                 }
 
                 is DataResponse.Success -> {
                     createLog("BLE_RES", " Success ${it.data} ")
                     hidePb()
                     try {
-                        val item = it.data as List<ScanResult>
-                        bleAdaptor.notifyDataSetChanged()
-                        bleAdaptor.submitList(item)
+                       if (it.data is List<*>){
+                           val item = it.data as List<ScanResult>
+                           bleAdaptor.notifyDataSetChanged()
+                           bleAdaptor.submitList(item)
+                       }else if (it.data is String){
+                           dialog("Success",it.data)
+                       }
                     } catch (e: Exception) {
                         createLog("LOG_BLE_ADAPTOR", "TESTING  ${e.localizedMessage}")
+                        dialog("Failed", e.localizedMessage?:"Unknown error")
                     }
                 }
             }
@@ -123,11 +135,17 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
     }
 
 
-    private fun showPb() {
-        binding.pbBle.isVisible = true
+    private fun showPb(txt: String) {
+        if (!binding.swipeRefresh.isRefreshing) {
+            binding.pbBle.isVisible = true
+            binding.msgPb.text = txt
+            binding.msgPb.show()
+        }
     }
 
     private fun hidePb() {
         binding.pbBle.isVisible = false
+        binding.msgPb.hide()
+        binding.swipeRefresh.isRefreshing = false
     }
 }

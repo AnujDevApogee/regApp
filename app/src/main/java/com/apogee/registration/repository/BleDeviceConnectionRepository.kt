@@ -12,6 +12,7 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
 import com.apogee.registration.utils.DataResponse
+import com.apogee.registration.utils.getEmojiByUnicode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -23,6 +24,8 @@ import kotlinx.coroutines.launch
 class BleDeviceConnectionRepository(
     private val bluetoothAdapter: BluetoothAdapter, private val context: Context
 ) {
+
+    private lateinit var gatt: BluetoothGatt
 
     private val _bleConnection =
         MutableStateFlow<DataResponse<out Any?>>(DataResponse.Loading(null))
@@ -78,10 +81,10 @@ class BleDeviceConnectionRepository(
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     isScanning = false
                     coroutineScope.launch {
-                        _bleConnection.value = (DataResponse.Error("Device Connected", null))
+                        _bleConnection.value = (DataResponse.Success("Device Connected Successfully"))
                     }
                     gatt.discoverServices()
-                    //      this@BleDeviceConnectionRepository.gatt = gatt
+                    this@BleDeviceConnectionRepository.gatt = gatt
                 }
             }
         }
@@ -90,9 +93,15 @@ class BleDeviceConnectionRepository(
 
 
     suspend fun startConnection() {
-        _bleConnection.value = (DataResponse.Loading("Scanning Ble devices..."))
-        delay(3000)
-        bleScanner.startScan(null, scanSetting.build(), scanCallback)
+        try {
+            _bleConnection.value = (DataResponse.Loading("Scanning Ble devices... ${getEmojiByUnicode(0x1F50E)}"))
+            bleScanner.startScan(null, scanSetting.build(), scanCallback)
+            delay(5000)
+            _bleConnection.value = (DataResponse.Success(deviceList))
+            bleScanner.stopScan(scanCallback)
+        } catch (e: Exception) {
+            _bleConnection.value = (DataResponse.Error(null, e))
+        }
     }
 
 
@@ -103,10 +112,9 @@ class BleDeviceConnectionRepository(
                     context, false, gattCallback, BluetoothDevice.TRANSPORT_LE
                 ) //, BluetoothDevice.TRANSPORT_LE
                 //BluetoothDevice.TRANSPORT_LE only if when you use normal device
-                delay(2000)
                 bleScanner.stopScan(scanCallback)
             } else {
-                _bleConnection.value = DataResponse.Error("Device Already connected", null)
+                _bleConnection.value = DataResponse.Error("Device Already connected.", null)
             }
         }
     }

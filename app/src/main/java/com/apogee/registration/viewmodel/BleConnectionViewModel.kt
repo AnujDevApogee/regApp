@@ -26,7 +26,7 @@ class BleConnectionViewModel(application: Application) : AndroidViewModel(applic
     val bleDeviceAvailable: LiveData<DataResponse<out Any?>>
         get() = _bleDeviceAvailable
 
-    private fun startConnection() {
+    fun startConnection() {
         viewModelScope.launch {
             repo.startConnection()
         }
