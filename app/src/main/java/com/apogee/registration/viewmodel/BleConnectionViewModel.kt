@@ -1,6 +1,7 @@
 package com.apogee.registration.viewmodel
 
 import android.app.Application
+import android.bluetooth.le.ScanResult
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -40,6 +41,12 @@ class BleConnectionViewModel(application: Application) : AndroidViewModel(applic
             repo.bleConnection.collect {
                 _bleDeviceAvailable.postValue(it)
             }
+        }
+    }
+
+   fun connectDevice(scanResult: ScanResult) {
+        viewModelScope.launch{
+            repo.setConnection(scanResult)
         }
     }
 

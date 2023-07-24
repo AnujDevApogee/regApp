@@ -3,10 +3,18 @@ package com.apogee.registration.utils
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
+import android.os.Build
+import android.text.Html
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import androidx.annotation.RequiresApi
+import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import com.google.gson.Gson
 
@@ -75,3 +83,21 @@ inline fun <reified T> deserializeFromJson(jsonFile: String?): T? {
 
 
 fun checkVaildString(string: String?) = string.isNullOrEmpty() || string.isBlank() || string=="null"
+
+
+fun setHtmlTxt(txt: String, color: String): Spanned {
+    return Html.fromHtml(
+        "<font color=$color>$txt</font>", HtmlCompat.FROM_HTML_MODE_COMPACT
+    )
+}
+
+fun setHtmlBoldTxt(txt: String): SpannableString {
+    val ss = SpannableString(txt)
+    val boldSpan = StyleSpan(Typeface.BOLD)
+    ss.setSpan(boldSpan, 0, txt.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    return ss
+}
+
+fun Activity.getColorInt(color: Int): Int {
+    return resources.getColor(color, null)
+}
