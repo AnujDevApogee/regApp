@@ -1,9 +1,7 @@
 package com.apogee.registration.ui.deivcelist
 
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.apogee.registration.R
