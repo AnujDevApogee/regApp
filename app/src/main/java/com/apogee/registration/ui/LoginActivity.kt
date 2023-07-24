@@ -8,6 +8,7 @@ import com.apogee.registration.databinding.LoginActivityLayoutBinding
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.closeKeyboard
 import com.apogee.registration.utils.createLog
+import com.apogee.registration.utils.goToNextActivity
 import com.apogee.registration.utils.invisible
 import com.apogee.registration.utils.openKeyBoard
 import com.apogee.registration.utils.setUpDialogBox
@@ -76,6 +77,7 @@ class LoginActivity : AppCompatActivity() {
                 is DataResponse.Success -> {
                     createLog("LOGIN_RES", "Success ${it.data}")
                     hidePb()
+                    goToNextActivity<DashBoardActivity>(true)
                 }
             }
         }
