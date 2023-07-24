@@ -72,4 +72,6 @@ inline fun <reified T> deserializeFromJson(jsonFile: String?): T? {
     return gson.fromJson(jsonFile, T::class.java)
 }
 
+
+
 fun checkVaildString(string: String?) = string.isNullOrEmpty() || string.isBlank() || string=="null"

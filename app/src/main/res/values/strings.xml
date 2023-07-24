@@ -4,4 +4,5 @@
     <string name="pass">Password</string>
     <string name="logn">Login</string>
     <string name="rem_btn">Remember Me</string>
+    <string name="navik_reg">Navik Registration</string>
 </resources>
