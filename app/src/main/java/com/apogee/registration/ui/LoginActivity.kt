@@ -10,6 +10,7 @@ import com.apogee.registration.utils.closeKeyboard
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.invisible
 import com.apogee.registration.utils.openKeyBoard
+import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.show
 import com.apogee.registration.viewmodel.LoginViewModel
 
@@ -27,6 +28,7 @@ class LoginActivity : AppCompatActivity() {
         viewModel.event.observe(this) {
             it.getContentIfNotHandled()?.let { msg ->
                 createLog("Login_res", msg)
+                dialog("Failed",msg)
             }
         }
 
@@ -58,6 +60,9 @@ class LoginActivity : AppCompatActivity() {
                     createLog(
                         "LOGIN_RES", "Error ${it.data} and Exp ${it.exception?.localizedMessage}"
                     )
+                    var err = (it.data as String?) ?: ""
+                    err += (it.exception?.localizedMessage) ?: ""
+                    dialog("Failed", err)
                     hidePb()
                 }
 
@@ -84,6 +89,14 @@ class LoginActivity : AppCompatActivity() {
     private fun showPb() {
         binding.pb.isVisible = true
         binding.loginBtn.invisible()
+    }
+
+    private fun dialog(title: String, msg: String) {
+        setUpDialogBox(title, msg, "ok", success = {
+
+        }, cancelListener = {
+
+        })
     }
 
     override fun onResume() {

@@ -43,7 +43,6 @@ class LoginRepository(context: Context) : CustomCallback {
         coroutine.launch {
             try {
                 _loginResponse.value = DataResponse.Loading("Please Wait")
-                delay(20000)
                 api.postDataWithBody(
                     loginRequest.setJsonObject(),
                     this@LoginRepository,
