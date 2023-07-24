@@ -9,6 +9,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.apogee.registration.R
 import com.apogee.registration.adaptor.BleDeviceAdaptor
 import com.apogee.registration.databinding.BluethoothDeviceListLayoutBinding
@@ -17,6 +18,7 @@ import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.OnItemClickListener
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
+import com.apogee.registration.utils.safeNavigate
 import com.apogee.registration.viewmodel.BleConnectionViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -80,6 +82,8 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
                     )
                     Toast.makeText(activity, "${it.data}", Toast.LENGTH_SHORT).show()
                     hidePb()
+                    findNavController()
+                        .safeNavigate(BluetoothDeviceListFragmentDirections.actionDeviceListFragmentToDeviceRegistrationFragment())
                 }
 
                 is DataResponse.Loading -> {
@@ -90,22 +94,23 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
                 is DataResponse.Success -> {
                     createLog("BLE_RES", " Success ${it.data} ")
                     hidePb()
-                   try {
-                       val item = it.data as List<ScanResult>
-                       bleAdaptor.notifyDataSetChanged()
-                       bleAdaptor.submitList(item)
-                   }catch (e:Exception){
-                       createLog("LOG","TESTING")
-                   }
+                    try {
+                        val item = it.data as List<ScanResult>
+                        bleAdaptor.notifyDataSetChanged()
+                        bleAdaptor.submitList(item)
+                    } catch (e: Exception) {
+                        createLog("LOG", "TESTING")
+                    }
                 }
             }
         }
     }
 
     private fun showPb() {
-        binding.pbBle.isVisible=true
+        binding.pbBle.isVisible = true
     }
-    private fun hidePb(){
-        binding.pbBle.isVisible=false
+
+    private fun hidePb() {
+        binding.pbBle.isVisible = false
     }
 }

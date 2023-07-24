@@ -16,6 +16,8 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.RequiresApi
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import com.google.gson.Gson
 
 
@@ -100,4 +102,17 @@ fun setHtmlBoldTxt(txt: String): SpannableString {
 
 fun Activity.getColorInt(color: Int): Int {
     return resources.getColor(color, null)
+}
+
+fun NavController.safeNavigate(direction: NavDirections) {
+    currentDestination?.getAction(direction.actionId)?.run {
+        navigate(direction)
+    }
+}
+
+
+fun NavController.safeNavigate(direction: Int) {
+    currentDestination?.getAction(direction)?.run {
+        navigate(direction)
+    }
 }

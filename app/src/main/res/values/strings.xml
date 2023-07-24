@@ -5,4 +5,5 @@
     <string name="logn">Login</string>
     <string name="rem_btn">Remember Me</string>
     <string name="navik_reg">Navik Registration</string>
+    <string name="ble_reg">Ble Registration</string>
 </resources>

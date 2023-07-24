@@ -9,5 +9,14 @@
         android:id="@+id/deviceListFragment"
         android:name="com.apogee.registration.ui.deivcelist.BluetoothDeviceListFragment"
         android:label="bluethooth_device_list_layout"
-        tools:layout="@layout/bluethooth_device_list_layout" />
+        tools:layout="@layout/bluethooth_device_list_layout" >
+        <action
+            android:id="@+id/action_deviceListFragment_to_deviceRegistrationFragment"
+            app:destination="@id/deviceRegistrationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/deviceRegistrationFragment"
+        android:name="com.apogee.registration.ui.registion.DeviceRegistrationFragment"
+        android:label="device_registration_layout"
+        tools:layout="@layout/device_registration_layout" />
 </navigation>
