@@ -5,7 +5,6 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -19,7 +18,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 @SuppressLint("MissingPermission")
 class BleDeviceConnectionRepository(
@@ -48,10 +46,13 @@ class BleDeviceConnectionRepository(
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             coroutineScope.launch {
-                if (result != null && result.device?.name != null && result.device.address != null && result.device.name.contains(
+                /*
+                * && result.device.name.contains(
                         "navik",
                         true
                     )
+                * */
+                if (result != null && result.device?.name != null && result.device.address != null
                 ) {
                     Log.i(
                         "deviceNm",
@@ -63,25 +64,10 @@ class BleDeviceConnectionRepository(
                     if (res == null) {
                         deviceList.add(result)
                     }
-                    _bleConnection.value = DataResponse.Success(deviceList)
-                    delay(1000)
+                    //_bleConnection.value = DataResponse.Success(deviceList)
+                    //delay(1000)
                 }
             }
-            /*   if (result?.device?.address == DEVICE_NAME) {
-                   coroutineScope.launch {
-                       _data.value =
-                           (Response.Loading(message = "Connecting with ${result.device.name}"))
-                   }
-                   if (isScanning) {
-                       result.device.connectGatt(
-                           context, false, gattCallback, BluetoothDevice.TRANSPORT_LE
-                       )*//*, BluetoothDevice.TRANSPORT_LE
-                    )*//*
-                    //BluetoothDevice.TRANSPORT_LE only if when you use normal device
-                    isScanning = false
-                    bleScanner.stopScan(this)
-                }
-            }*/
         }
     }
 
@@ -90,6 +76,7 @@ class BleDeviceConnectionRepository(
         override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
             if (status == BluetoothGatt.GATT_SUCCESS) {
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
+                    isScanning = false
                     coroutineScope.launch {
                         _bleConnection.value = (DataResponse.Error("Device Connected", null))
                     }
@@ -116,9 +103,10 @@ class BleDeviceConnectionRepository(
                     context, false, gattCallback, BluetoothDevice.TRANSPORT_LE
                 ) //, BluetoothDevice.TRANSPORT_LE
                 //BluetoothDevice.TRANSPORT_LE only if when you use normal device
-                isScanning = false
-                delay(5000)
+                delay(2000)
                 bleScanner.stopScan(scanCallback)
+            } else {
+                _bleConnection.value = DataResponse.Error("Device Already connected", null)
             }
         }
     }

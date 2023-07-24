@@ -10,6 +10,8 @@ import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.repository.BleDeviceConnectionRepository
 import com.apogee.registration.utils.DataResponse
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class BleConnectionViewModel(application: Application) : AndroidViewModel(application) {
@@ -38,7 +40,7 @@ class BleConnectionViewModel(application: Application) : AndroidViewModel(applic
 
     private fun listenerBle() {
         viewModelScope.launch {
-            repo.bleConnection.collect {
+            repo.bleConnection.collectLatest {
                 _bleDeviceAvailable.postValue(it)
             }
         }

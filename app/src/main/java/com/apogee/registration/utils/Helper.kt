@@ -13,6 +13,7 @@ import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
@@ -98,6 +99,10 @@ fun setHtmlBoldTxt(txt: String): SpannableString {
     val boldSpan = StyleSpan(Typeface.BOLD)
     ss.setSpan(boldSpan, 0, txt.length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     return ss
+}
+
+fun Activity.showToastMsg(msg: String){
+    Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }
 
 fun Activity.getColorInt(color: Int): Int {

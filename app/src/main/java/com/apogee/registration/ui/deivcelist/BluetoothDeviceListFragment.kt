@@ -4,12 +4,10 @@ import android.annotation.SuppressLint
 import android.bluetooth.le.ScanResult
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import com.apogee.registration.R
 import com.apogee.registration.adaptor.BleDeviceAdaptor
 import com.apogee.registration.databinding.BluethoothDeviceListLayoutBinding
@@ -18,7 +16,7 @@ import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.OnItemClickListener
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
-import com.apogee.registration.utils.safeNavigate
+import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.viewmodel.BleConnectionViewModel
 import kotlinx.coroutines.launch
 import java.lang.Exception
@@ -38,13 +36,23 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
     private val mnuCallBack = object :
         OnItemClickListener {
         override fun <T> onClickListener(response: T) {
-            lifecycleScope.launch {
-                regSharedPref.logout().also {
-                    if (it) {
-                        activity?.finish()
+            activity?.setUpDialogBox(
+                getString(R.string.login_res),
+                getString(R.string.logout_desc),
+                "Logout",
+                "Cancel",
+                success = {
+                    lifecycleScope.launch {
+                        regSharedPref.logout().also {
+                            if (it) {
+                                activity?.finish()
+                            }
+                        }
                     }
-                }
-            }
+                },
+                cancelListener = {
+
+                })
         }
     }
 
@@ -80,10 +88,10 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
                     createLog(
                         "BLE_RES", "Error ${it.data} and Exp ${it.exception?.localizedMessage}"
                     )
-                    Toast.makeText(activity, "${it.data}", Toast.LENGTH_SHORT).show()
                     hidePb()
-                    findNavController()
-                        .safeNavigate(BluetoothDeviceListFragmentDirections.actionDeviceListFragmentToDeviceRegistrationFragment())
+                    var error = (it.data as String?) ?: ""
+                    error += (it.exception?.localizedMessage) ?: ""
+                    dialog("Failed", error)
                 }
 
                 is DataResponse.Loading -> {
@@ -99,12 +107,21 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
                         bleAdaptor.notifyDataSetChanged()
                         bleAdaptor.submitList(item)
                     } catch (e: Exception) {
-                        createLog("LOG", "TESTING")
+                        createLog("LOG_BLE_ADAPTOR", "TESTING  ${e.localizedMessage}")
                     }
                 }
             }
         }
     }
+
+    private fun dialog(title: String, msg: String) {
+        activity?.setUpDialogBox(title, msg, "ok", success = {
+
+        }, cancelListener = {
+
+        })
+    }
+
 
     private fun showPb() {
         binding.pbBle.isVisible = true
