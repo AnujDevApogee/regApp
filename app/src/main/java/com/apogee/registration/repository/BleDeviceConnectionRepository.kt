@@ -81,7 +81,8 @@ class BleDeviceConnectionRepository(
                 if (newState == BluetoothProfile.STATE_CONNECTED) {
                     isScanning = false
                     coroutineScope.launch {
-                        _bleConnection.value = (DataResponse.Success("Device Connected Successfully"))
+                        _bleConnection.value =
+                            (DataResponse.Success("Device Connected Successfully"))
                     }
                     gatt.discoverServices()
                     this@BleDeviceConnectionRepository.gatt = gatt
@@ -94,7 +95,8 @@ class BleDeviceConnectionRepository(
 
     suspend fun startConnection() {
         try {
-            _bleConnection.value = (DataResponse.Loading("Scanning Ble devices... ${getEmojiByUnicode(0x1F50E)}"))
+            _bleConnection.value =
+                (DataResponse.Loading("Scanning Ble devices... ${getEmojiByUnicode(0x1F50E)}"))
             bleScanner.startScan(null, scanSetting.build(), scanCallback)
             delay(5000)
             _bleConnection.value = (DataResponse.Success(deviceList))
@@ -105,7 +107,7 @@ class BleDeviceConnectionRepository(
     }
 
 
-    suspend fun setConnection(result: ScanResult) {
+    fun setConnection(result: ScanResult) {
         coroutineScope.launch {
             if (isScanning) {
                 result.device.connectGatt(
@@ -118,6 +120,15 @@ class BleDeviceConnectionRepository(
             }
         }
     }
+
+    fun disconnectBle() {
+        bleScanner.stopScan(scanCallback)
+        gatt.close()
+        coroutineScope.launch {
+
+        }
+    }
+
 
     private var isScanning = true
 }

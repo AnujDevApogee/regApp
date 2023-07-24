@@ -11,7 +11,6 @@ import com.apogee.registration.repository.BleDeviceConnectionRepository
 import com.apogee.registration.utils.DataResponse
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class BleConnectionViewModel(application: Application) : AndroidViewModel(application) {
@@ -46,12 +45,14 @@ class BleConnectionViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-   fun connectDevice(scanResult: ScanResult) {
-        viewModelScope.launch{
-            repo.setConnection(scanResult)
-        }
+    fun connectDevice(scanResult: ScanResult) {
+        repo.setConnection(scanResult)
     }
 
+
+    fun disconnectConnection(){
+
+    }
 
     override fun onCleared() {
         super.onCleared()
