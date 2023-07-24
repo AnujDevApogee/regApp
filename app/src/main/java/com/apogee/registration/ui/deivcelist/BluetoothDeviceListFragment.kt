@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.apogee.registration.R
 import com.apogee.registration.adaptor.BleDeviceAdaptor
 import com.apogee.registration.databinding.BluethoothDeviceListLayoutBinding
@@ -17,6 +18,7 @@ import com.apogee.registration.utils.OnItemClickListener
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
 import com.apogee.registration.utils.hide
+import com.apogee.registration.utils.safeNavigate
 import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.show
 import com.apogee.registration.viewmodel.BleConnectionViewModel
@@ -70,7 +72,7 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
         setupRecycleAdaptor()
         getBleDevice()
         binding.swipeRefresh.setOnRefreshListener {
-            if (binding.swipeRefresh.isRefreshing){
+            if (binding.swipeRefresh.isRefreshing) {
                 viewModel.startConnection()
             }
         }
@@ -110,16 +112,16 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
                     createLog("BLE_RES", " Success ${it.data} ")
                     hidePb()
                     try {
-                       if (it.data is List<*>){
-                           val item = it.data as List<ScanResult>
-                           bleAdaptor.notifyDataSetChanged()
-                           bleAdaptor.submitList(item)
-                       }else if (it.data is String){
-                           dialog("Success",it.data)
-                       }
+                        if (it.data is List<*>) {
+                            val item = it.data as List<ScanResult>
+                            bleAdaptor.notifyDataSetChanged()
+                            bleAdaptor.submitList(item)
+                        } else if (it.data is String) {
+                            dialog("Success", it.data)
+                        }
                     } catch (e: Exception) {
                         createLog("LOG_BLE_ADAPTOR", "TESTING  ${e.localizedMessage}")
-                        dialog("Failed", e.localizedMessage?:"Unknown error")
+                        dialog("Failed", e.localizedMessage ?: "Unknown error")
                     }
                 }
             }
@@ -128,7 +130,11 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
 
     private fun dialog(title: String, msg: String) {
         activity?.setUpDialogBox(title, msg, "ok", success = {
-
+            if (title == "Success") {
+                val dir =
+                    BluetoothDeviceListFragmentDirections.actionDeviceListFragmentToDeviceRegistrationFragment()
+                findNavController().safeNavigate(dir)
+            }
         }, cancelListener = {
 
         })
