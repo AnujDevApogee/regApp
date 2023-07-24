@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private var repository = LoginRepository()
-
     private val app = application
+    private var repository = LoginRepository(application)
+
 
     private val _loginResponse = MutableLiveData<DataResponse<out Any?>>()
     val loginResponse: LiveData<DataResponse<out Any?>>

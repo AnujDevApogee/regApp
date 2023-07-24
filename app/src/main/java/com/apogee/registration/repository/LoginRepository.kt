@@ -71,7 +71,7 @@ class LoginRepository(context: Context) : CustomCallback {
                         try {
                             val loginResponse =
                                 deserializeFromJson<LoginResponse>(requestBody.string())
-                            loginSharePref.saveLoginResponse(loginResponse!!)
+                         //   loginSharePref.saveLoginResponse(loginResponse!!)
                             _loginResponse.value = DataResponse.Success(
                                 loginResponse
                             )

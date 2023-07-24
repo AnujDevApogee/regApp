@@ -23,7 +23,6 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = LoginActivityLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        openKeyBoard(binding.userNm)
 
         viewModel.event.observe(this) {
             it.getContentIfNotHandled()?.let { msg ->
@@ -52,6 +51,7 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 is DataResponse.Loading -> {
+                    createLog("LOGIN_RES"," LOADING ${it.data} ")
                     it.data?.let {
                         showPb()
                     }
@@ -75,7 +75,10 @@ class LoginActivity : AppCompatActivity() {
         binding.loginBtn.invisible()
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        openKeyBoard(binding.userNm)
+    }
 
 
     override fun onPause() {
