@@ -30,14 +30,25 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
+        viewModel.getLoginResponse()
+        getSavedResponse()
         getLoginResponse()
 
         binding.loginBtn.setOnClickListener {
-            val email = binding.userNm.text.toString()
+            val username = binding.userNm.text.toString()
             val pass = binding.passWord.text.toString()
-            viewModel.loginUser(email, pass)
+            val isRemember = binding.rememberMe.isChecked
+            viewModel.loginUser(username, pass, isRemember)
         }
 
+    }
+
+    private fun getSavedResponse() {
+        viewModel.saveCredentials.observe(this) {
+            binding.userNm.setText(it.first.first)
+            binding.passWord.setText(it.first.second)
+            binding.rememberMe.isChecked = it.second
+        }
     }
 
     private fun getLoginResponse() {
@@ -51,7 +62,7 @@ class LoginActivity : AppCompatActivity() {
                 }
 
                 is DataResponse.Loading -> {
-                    createLog("LOGIN_RES"," LOADING ${it.data} ")
+                    createLog("LOGIN_RES", " LOADING ${it.data} ")
                     it.data?.let {
                         showPb()
                     }
@@ -67,7 +78,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun hidePb() {
         binding.loginBtn.show()
-        binding.pb.isVisible=false
+        binding.pb.isVisible = false
     }
 
     private fun showPb() {

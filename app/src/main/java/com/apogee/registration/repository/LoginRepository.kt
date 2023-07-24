@@ -71,10 +71,15 @@ class LoginRepository(context: Context) : CustomCallback {
                         try {
                             val loginResponse =
                                 deserializeFromJson<LoginResponse>(requestBody.string())
-                         //   loginSharePref.saveLoginResponse(loginResponse!!)
-                            _loginResponse.value = DataResponse.Success(
-                                loginResponse
-                            )
+                            if (loginResponse == null || loginResponse.data.isNullOrEmpty()) {
+                                _loginResponse.value =
+                                    DataResponse.Error("Invalid Credentials", null)
+                            } else {
+                                loginSharePref.saveLoginResponse(loginResponse)
+                                _loginResponse.value = DataResponse.Success(
+                                    loginResponse
+                                )
+                            }
                         } catch (e: Exception) {
                             _loginResponse.value = DataResponse.Error(null, e)
                         }
@@ -97,6 +102,18 @@ class LoginRepository(context: Context) : CustomCallback {
         coroutine.launch {
             _loginResponse.value = DataResponse.Error(p0.toString(), p1)
         }
+    }
+
+
+    fun getSaveCredentials(): Pair<Pair<String, String>, Boolean> {
+        return loginSharePref.getLoginCredential()
+    }
+
+
+    fun saveCredentials(loginRequest: LoginRequest, isRemember: Boolean) {
+        loginSharePref.saveUserNameAndPassword(
+            username = loginRequest.username, pass = loginRequest.password, isRemember
+        )
     }
 
 }
