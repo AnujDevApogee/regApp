@@ -8,22 +8,31 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.apogee.registration.R
 import com.apogee.registration.databinding.BleDeviceItemBinding
 import com.apogee.registration.utils.createLog
+import com.apogee.registration.utils.hide
 import com.apogee.registration.utils.setHtmlBoldTxt
 import com.apogee.registration.utils.setHtmlTxt
+import com.apogee.registration.utils.show
 import java.lang.reflect.Method
 
 
 typealias itemClicked = (data: ScanResult) -> Unit
+typealias itemClickedDisconnect = (data: ScanResult) -> Unit
 
 @SuppressLint("MissingPermission")
-class BleDeviceAdaptor(private val itemClicked: itemClicked) :
+class BleDeviceAdaptor(
+    private val itemClicked: itemClicked,
+    private val itemClickedDisconnect: itemClickedDisconnect
+) :
     ListAdapter<ScanResult, BleDeviceAdaptor.BleDeviceViewHolder>(diffUtil) {
     inner class BleDeviceViewHolder(private val binding: BleDeviceItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun setData(data: ScanResult, itemClicked: itemClicked) {
+        fun setData(
+            data: ScanResult,
+            itemClicked: itemClicked,
+            itemClickedDisconnect: itemClickedDisconnect
+        ) {
             binding.connectionInfo.text = setHtmlBoldTxt("Device Name ")
             binding.connectionInfo.append(setHtmlTxt(data.device.name.toString(), "'#EC938F'"))
             binding.connectionInfo.append("\n")
@@ -32,30 +41,28 @@ class BleDeviceAdaptor(private val itemClicked: itemClicked) :
             binding.connectionInfo.append(setHtmlTxt(data.device.address.toString(), "'#EC938F'"))
             binding.connectionInfo.append("\n")
 
-            if (isConnected(device = data.device)==true){
-                binding.cardView.setBackgroundColor(
+            if (isConnected(device = data.device) == true) {
+               /* binding.cardView.setBackgroundColor(
                     binding.cardView.resources.getColor(
                         R.color.md_theme_light_primaryContainer,
                         null
                     )
-                )
+                )*/
+                binding.btnSubmit.show()
+            }else{
+                binding.btnSubmit.hide()
             }
 
-            binding.cardView.setOnClickListener {
+            binding.connectionInfo.setOnClickListener {
                 itemClicked.invoke(data)
             }
+
+            binding.btnSubmit.setOnClickListener {
+                itemClickedDisconnect.invoke(data)
+            }
         }
     }
 
-    fun isConnected(device: BluetoothDevice): Boolean? {
-        return try {
-            val m: Method = device.javaClass.getMethod("isConnected")
-            m.invoke(device) as Boolean
-        } catch (e: Exception) {
-            createLog("BLE_CONNECT", "isConnected: ${e.localizedMessage}")
-            null
-        }
-    }
 
     companion object {
         val diffUtil = object : DiffUtil.ItemCallback<ScanResult>() {
@@ -69,6 +76,16 @@ class BleDeviceAdaptor(private val itemClicked: itemClicked) :
                 newItem: ScanResult
             ) = oldItem == newItem
         }
+
+        fun isConnected(device: BluetoothDevice): Boolean? {
+            return try {
+                val m: Method = device.javaClass.getMethod("isConnected")
+                m.invoke(device) as Boolean
+            } catch (e: Exception) {
+                createLog("BLE_CONNECT", "isConnected: ${e.localizedMessage}")
+                null
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BleDeviceViewHolder {
@@ -80,7 +97,7 @@ class BleDeviceAdaptor(private val itemClicked: itemClicked) :
     override fun onBindViewHolder(holder: BleDeviceViewHolder, position: Int) {
         val currItem = getItem(position)
         currItem?.let {
-            holder.setData(it, itemClicked)
+            holder.setData(it, itemClicked,itemClickedDisconnect)
         }
     }
 

@@ -7,5 +7,7 @@
     <string name="navik_reg">Navik Registration</string>
     <string name="ble_reg">Ble Registration</string>
     <string name="login_res">Logout</string>
+    <string name="con_btn">Connected</string>
+    <string name="dis_btn">Disconnect</string>
     <string name="logout_desc">Are you sure you want to Logout</string>
 </resources>

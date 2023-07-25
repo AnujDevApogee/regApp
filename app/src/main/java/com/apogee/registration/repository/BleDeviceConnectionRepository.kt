@@ -11,6 +11,7 @@ import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.util.Log
+import com.apogee.registration.model.BleDeviceConnection
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.getEmojiByUnicode
 import kotlinx.coroutines.CoroutineScope
@@ -32,6 +33,7 @@ class BleDeviceConnectionRepository(
     val bleConnection: StateFlow<DataResponse<out Any?>>
         get() = _bleConnection
 
+    private var isScanning = true
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -55,11 +57,9 @@ class BleDeviceConnectionRepository(
                         true
                     )
                 * */
-                if (result != null && result.device?.name != null && result.device.address != null
-                ) {
+                if (result != null && result.device?.name != null && result.device.address != null) {
                     Log.i(
-                        "deviceNm",
-                        "onScanResult: ${result.device.name}  ${result.device.address}"
+                        "deviceNm", "onScanResult: ${result.device.name}  ${result.device.address}"
                     )
                     val res = deviceList.find {
                         it.device.address == result.device.address
@@ -82,7 +82,13 @@ class BleDeviceConnectionRepository(
                     isScanning = false
                     coroutineScope.launch {
                         _bleConnection.value =
-                            (DataResponse.Success("Device Connected Successfully"))
+                            (DataResponse.Success(
+                                BleDeviceConnection(
+                                    listOf(),
+                                    "Device Connected Successfully  ${getEmojiByUnicode(0x1F4E1)}",
+                                    BleDeviceConnection.Companion.BleDeviceStatus.CONNECTED.name
+                                )
+                            ))
                     }
                     gatt.discoverServices()
                     this@BleDeviceConnectionRepository.gatt = gatt
@@ -99,7 +105,13 @@ class BleDeviceConnectionRepository(
                 (DataResponse.Loading("Scanning Ble devices... ${getEmojiByUnicode(0x1F50E)}"))
             bleScanner.startScan(null, scanSetting.build(), scanCallback)
             delay(5000)
-            _bleConnection.value = (DataResponse.Success(deviceList))
+            _bleConnection.value = (DataResponse.Success(
+                BleDeviceConnection(
+                    deviceList,
+                    "",
+                    BleDeviceConnection.Companion.BleDeviceStatus.AVAILABLE.name
+                )
+            ))
             bleScanner.stopScan(scanCallback)
         } catch (e: Exception) {
             _bleConnection.value = (DataResponse.Error(null, e))
@@ -110,25 +122,48 @@ class BleDeviceConnectionRepository(
     fun setConnection(result: ScanResult) {
         coroutineScope.launch {
             if (isScanning) {
+                _bleConnection.value = DataResponse.Success(
+                    BleDeviceConnection(
+                        listOf(),
+                        "",
+                        BleDeviceConnection.Companion.BleDeviceStatus.CONNECTING.name
+                    )
+                )
                 result.device.connectGatt(
                     context, false, gattCallback, BluetoothDevice.TRANSPORT_LE
                 ) //, BluetoothDevice.TRANSPORT_LE
                 //BluetoothDevice.TRANSPORT_LE only if when you use normal device
                 bleScanner.stopScan(scanCallback)
             } else {
-                _bleConnection.value = DataResponse.Error("Device Already connected.", null)
+                _bleConnection.value = DataResponse.Success(
+                    BleDeviceConnection(
+                        listOf(),
+                        "Device is Already Connected.Please disconnect to device to establish new connection ${
+                            getEmojiByUnicode(
+                                0x1F4E1
+                            )
+                        }",
+                        BleDeviceConnection.Companion.BleDeviceStatus.CONNECTED.name
+                    )
+                )
             }
         }
     }
 
     fun disconnectBle() {
-        bleScanner.stopScan(scanCallback)
-        gatt.close()
         coroutineScope.launch {
-
+            bleScanner.stopScan(scanCallback)
+            gatt.close()
+            isScanning = true
+            _bleConnection.value = DataResponse.Success(
+                BleDeviceConnection(
+                    listOf(),
+                    "Device Is Disconnected. ${getEmojiByUnicode(0x1F4E1)}",
+                    BleDeviceConnection.Companion.BleDeviceStatus.DISCONNECT.name
+                )
+            )
         }
     }
 
 
-    private var isScanning = true
 }

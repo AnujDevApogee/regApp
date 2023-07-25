@@ -1,7 +1,6 @@
 package com.apogee.registration.ui.deivcelist
 
 import android.annotation.SuppressLint
-import android.bluetooth.le.ScanResult
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
@@ -13,17 +12,19 @@ import com.apogee.registration.R
 import com.apogee.registration.adaptor.BleDeviceAdaptor
 import com.apogee.registration.databinding.BluethoothDeviceListLayoutBinding
 import com.apogee.registration.datastore.RegistrationAppSharedPref
+import com.apogee.registration.model.BleDeviceConnection
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.OnItemClickListener
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
+import com.apogee.registration.utils.getEmojiByUnicode
 import com.apogee.registration.utils.hide
 import com.apogee.registration.utils.safeNavigate
 import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.show
+import com.apogee.registration.utils.showToastMsg
 import com.apogee.registration.viewmodel.BleConnectionViewModel
 import kotlinx.coroutines.launch
-import java.lang.Exception
 
 class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_layout) {
     private lateinit var binding: BluethoothDeviceListLayoutBinding
@@ -72,24 +73,33 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
         setupRecycleAdaptor()
         getBleDevice()
         binding.swipeRefresh.setOnRefreshListener {
+            activity?.showToastMsg("Searching for available device ${getEmojiByUnicode(0x1F50E)}")
             if (binding.swipeRefresh.isRefreshing) {
                 viewModel.startConnection()
             }
         }
+
+        binding.connectBtn.setOnClickListener {
+            val dir =
+                BluetoothDeviceListFragmentDirections.actionDeviceListFragmentToDeviceRegistrationFragment()
+            findNavController().safeNavigate(dir)
+        }
+
     }
 
     private fun setupRecycleAdaptor() {
         binding.recycleViewBle.apply {
-            bleAdaptor = BleDeviceAdaptor {
+            bleAdaptor = BleDeviceAdaptor(itemClicked = {
                 createLog("BLE_CLICK", "$it")
                 viewModel.connectDevice(it)
-            }
+            }, itemClickedDisconnect = {
+                viewModel.disconnectConnection()
+            })
             adapter = bleAdaptor
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    @Suppress("UNCHECKED_CAST")
     private fun getBleDevice() {
         viewModel.bleDeviceAvailable.observe(viewLifecycleOwner) {
             when (it) {
@@ -111,30 +121,61 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
                 is DataResponse.Success -> {
                     createLog("BLE_RES", " Success ${it.data} ")
                     hidePb()
-                    try {
-                        if (it.data is List<*>) {
-                            val item = it.data as List<ScanResult>
-                            bleAdaptor.notifyDataSetChanged()
-                            bleAdaptor.submitList(item)
-                        } else if (it.data is String) {
-                            dialog("Success", it.data)
-                        }
-                    } catch (e: Exception) {
-                        createLog("LOG_BLE_ADAPTOR", "TESTING  ${e.localizedMessage}")
-                        dialog("Failed", e.localizedMessage ?: "Unknown error")
-                    }
+                    monitorBle(it.data as BleDeviceConnection)
                 }
             }
         }
     }
 
-    private fun dialog(title: String, msg: String) {
-        activity?.setUpDialogBox(title, msg, "ok", success = {
-            if (title == "Success") {
-                val dir =
-                    BluetoothDeviceListFragmentDirections.actionDeviceListFragmentToDeviceRegistrationFragment()
-                findNavController().safeNavigate(dir)
+    @SuppressLint("NotifyDataSetChanged")
+    private fun monitorBle(data: BleDeviceConnection) {
+        when (BleDeviceConnection.Companion.BleDeviceStatus.valueOf(data.status)) {
+
+            BleDeviceConnection.Companion.BleDeviceStatus.DISCONNECT -> {
+                dialog("Success", data.msg)
+                binding.connectBtn.hide()
+                binding.swipeRefresh.post {
+                    binding.swipeRefresh.isRefreshing = true
+                    viewModel.startConnection()
+                }
             }
+
+            BleDeviceConnection.Companion.BleDeviceStatus.CONNECTED -> {
+                dialog("Success", data.msg)
+                binding.connectBlePb.isVisible = false
+                binding.connectBtn.show()
+                binding.swipeRefresh.post {
+                    binding.swipeRefresh.isRefreshing = true
+                    viewModel.startConnection()
+                }
+            }
+
+            BleDeviceConnection.Companion.BleDeviceStatus.AVAILABLE -> {
+                try {
+                    bleAdaptor.notifyDataSetChanged()
+                    bleAdaptor.submitList(data.list)
+
+                    data.list.forEach { device ->
+                        if (BleDeviceAdaptor.isConnected(device.device) == true) {
+                            binding.connectBtn.show()
+                        }
+                    }
+
+                } catch (e: Exception) {
+                    createLog("LOG_BLE_ADAPTOR", "TESTING  ${e.localizedMessage}")
+                    dialog("Failed", e.localizedMessage ?: "Unknown error")
+                }
+            }
+
+            BleDeviceConnection.Companion.BleDeviceStatus.CONNECTING -> {
+                binding.connectBlePb.isVisible = true
+            }
+        }
+    }
+
+    private fun dialog(title: String, msg: String) {
+        activity?.setUpDialogBox(title, msg, "OK", success = {
+
         }, cancelListener = {
 
         })
@@ -152,6 +193,7 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
     private fun hidePb() {
         binding.pbBle.isVisible = false
         binding.msgPb.hide()
+        binding.connectBlePb.isVisible=false
         binding.swipeRefresh.isRefreshing = false
     }
 }
