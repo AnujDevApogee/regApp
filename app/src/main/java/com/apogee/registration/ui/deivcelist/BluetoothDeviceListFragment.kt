@@ -7,6 +7,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.apogee.registration.R
 import com.apogee.registration.adaptor.BleDeviceAdaptor
 import com.apogee.registration.databinding.BluethoothDeviceListLayoutBinding
@@ -18,13 +19,14 @@ import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
 import com.apogee.registration.utils.getEmojiByUnicode
 import com.apogee.registration.utils.hide
+import com.apogee.registration.utils.safeNavigate
 import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.show
 import com.apogee.registration.utils.showToastMsg
 import com.apogee.registration.viewmodel.BleConnectionViewModel
 import kotlinx.coroutines.launch
 
-
+@SuppressLint("MissingPermission")
 class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_layout) {
     private lateinit var binding: BluethoothDeviceListLayoutBinding
 
@@ -86,6 +88,8 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
             bleAdaptor = BleDeviceAdaptor(itemClicked = {
                 createLog("BLE_CLICK", "$it")
                 showToastMsg("show item $it")
+                val dir=BluetoothDeviceListFragmentDirections.actionDeviceListFragmentToDeviceRegistrationFragment(it.device.name,it.device.address)
+                findNavController().safeNavigate(dir)
             })
             adapter = bleAdaptor
         }

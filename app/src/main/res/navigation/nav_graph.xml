@@ -18,5 +18,11 @@
         android:id="@+id/deviceRegistrationFragment"
         android:name="com.apogee.registration.ui.registion.DeviceRegistrationFragment"
         android:label="device_registration_layout"
-        tools:layout="@layout/device_registration_layout" />
+        tools:layout="@layout/device_registration_layout" >
+        <argument
+            android:name="devicename"
+            app:argType="string" />
+        <argument android:name="macaddress"
+            app:argType="string" />
+    </fragment>
 </navigation>
