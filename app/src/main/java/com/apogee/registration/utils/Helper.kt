@@ -23,9 +23,9 @@ import androidx.navigation.NavDirections
 import com.google.gson.Gson
 
 
-object ApiUrl{
-    val loginUrl=Pair("http://120.138.10.146:8080/login_module/api/getLoginPersonData/",1)
-    val loginProjectName="RegistrationCumAllotment"
+object ApiUrl {
+    val loginUrl = Pair("http://120.138.10.146:8080/login_module/api/getLoginPersonData/", 1)
+    val loginProjectName = "RegistrationCumAllotment"
 }
 
 fun View.hide() {
@@ -59,7 +59,7 @@ inline fun <reified T> Activity.goToNextActivity(isRemoveBckStg: Boolean = false
     }
 }
 
-fun createLog(tag:String,msg:String){
+fun createLog(tag: String, msg: String) {
     Log.i(tag, "createLog: $msg")
 }
 
@@ -85,8 +85,8 @@ inline fun <reified T> deserializeFromJson(jsonFile: String?): T? {
 }
 
 
-
-fun checkVaildString(string: String?) = string.isNullOrEmpty() || string.isBlank() || string=="null"
+fun checkVaildString(string: String?) =
+    string.isNullOrEmpty() || string.isBlank() || string == "null"
 
 
 fun setHtmlTxt(txt: String, color: String): Spanned {
@@ -102,11 +102,11 @@ fun setHtmlBoldTxt(txt: String): SpannableString {
     return ss
 }
 
-fun Activity.showToastMsg(msg: String){
+fun Activity.showToastMsg(msg: String) {
     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }
 
-fun Fragment.showToastMsg(msg: String){
+fun Fragment.showToastMsg(msg: String) {
     Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
 }
 
