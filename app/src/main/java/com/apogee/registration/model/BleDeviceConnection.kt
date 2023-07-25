@@ -7,7 +7,7 @@ data class BleDeviceConnection(
 ) {
     companion object {
         enum class BleDeviceStatus {
-            DISCONNECT, CONNECTED, AVAILABLE, CONNECTING
+            AVAILABLE
         }
     }
 }

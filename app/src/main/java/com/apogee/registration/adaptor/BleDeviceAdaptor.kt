@@ -1,7 +1,6 @@
 package com.apogee.registration.adaptor
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanResult
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -9,29 +8,22 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.apogee.registration.databinding.BleDeviceItemBinding
-import com.apogee.registration.utils.createLog
-import com.apogee.registration.utils.hide
 import com.apogee.registration.utils.setHtmlBoldTxt
 import com.apogee.registration.utils.setHtmlTxt
-import com.apogee.registration.utils.show
-import java.lang.reflect.Method
 
 
 typealias itemClicked = (data: ScanResult) -> Unit
-typealias itemClickedDisconnect = (data: ScanResult) -> Unit
 
 @SuppressLint("MissingPermission")
 class BleDeviceAdaptor(
-    private val itemClicked: itemClicked,
-    private val itemClickedDisconnect: itemClickedDisconnect
+    private val itemClicked: itemClicked
 ) :
     ListAdapter<ScanResult, BleDeviceAdaptor.BleDeviceViewHolder>(diffUtil) {
     inner class BleDeviceViewHolder(private val binding: BleDeviceItemBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun setData(
             data: ScanResult,
-            itemClicked: itemClicked,
-            itemClickedDisconnect: itemClickedDisconnect
+            itemClicked: itemClicked
         ) {
             binding.connectionInfo.text = setHtmlBoldTxt("Device Name ")
             binding.connectionInfo.append(setHtmlTxt(data.device.name.toString(), "'#EC938F'"))
@@ -41,25 +33,10 @@ class BleDeviceAdaptor(
             binding.connectionInfo.append(setHtmlTxt(data.device.address.toString(), "'#EC938F'"))
             binding.connectionInfo.append("\n")
 
-            if (isConnected(device = data.device) == true) {
-               /* binding.cardView.setBackgroundColor(
-                    binding.cardView.resources.getColor(
-                        R.color.md_theme_light_primaryContainer,
-                        null
-                    )
-                )*/
-                binding.btnSubmit.show()
-            }else{
-                binding.btnSubmit.hide()
-            }
-
-            binding.connectionInfo.setOnClickListener {
+            binding.cardView.setOnClickListener {
                 itemClicked.invoke(data)
             }
 
-            binding.btnSubmit.setOnClickListener {
-                itemClickedDisconnect.invoke(data)
-            }
         }
     }
 
@@ -77,7 +54,7 @@ class BleDeviceAdaptor(
             ) = oldItem == newItem
         }
 
-        fun isConnected(device: BluetoothDevice): Boolean? {
+       /* fun isConnected(device: BluetoothDevice): Boolean? {
             return try {
                 val m: Method = device.javaClass.getMethod("isConnected")
                 m.invoke(device) as Boolean
@@ -85,7 +62,7 @@ class BleDeviceAdaptor(
                 createLog("BLE_CONNECT", "isConnected: ${e.localizedMessage}")
                 null
             }
-        }
+        }*/
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BleDeviceViewHolder {
@@ -97,7 +74,7 @@ class BleDeviceAdaptor(
     override fun onBindViewHolder(holder: BleDeviceViewHolder, position: Int) {
         val currItem = getItem(position)
         currItem?.let {
-            holder.setData(it, itemClicked,itemClickedDisconnect)
+            holder.setData(it, itemClicked)
         }
     }
 

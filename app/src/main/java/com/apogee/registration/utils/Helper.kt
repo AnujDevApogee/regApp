@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import com.google.gson.Gson
@@ -103,6 +104,10 @@ fun setHtmlBoldTxt(txt: String): SpannableString {
 
 fun Activity.showToastMsg(msg: String){
     Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+}
+
+fun Fragment.showToastMsg(msg: String){
+    Toast.makeText(activity, msg, Toast.LENGTH_SHORT).show()
 }
 
 fun Activity.getColorInt(color: Int): Int {

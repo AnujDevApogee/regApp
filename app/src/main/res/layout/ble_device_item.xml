@@ -32,24 +32,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="kdlfhkdf jhdkgfhf dkhfgkgfhkfghk\nhklfh\ndkhlgf\hfgkhlfg\hkgflh\nklfh\fhklgf;" />
-
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_submit"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/dis_btn"
-                android:textSize="17sp"
-                android:visibility="gone"
-                app:layout_constraintLeft_toLeftOf="@id/connection_info"
-                app:layout_constraintRight_toRightOf="@id/connection_info"
-                app:layout_constraintTop_toBottomOf="@id/connection_info" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

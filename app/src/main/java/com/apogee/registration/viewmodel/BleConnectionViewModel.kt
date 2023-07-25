@@ -1,7 +1,6 @@
 package com.apogee.registration.viewmodel
 
 import android.app.Application
-import android.bluetooth.le.ScanResult
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,7 +15,7 @@ class BleConnectionViewModel(application: Application) : AndroidViewModel(applic
     private val adaptor = BluetoothCommunication.getInstance(application).getBluetoothAdaptor()
 
     private val repo = BleDeviceConnectionRepository(
-        adaptor, application
+        adaptor
     )
 
 
@@ -44,14 +43,6 @@ class BleConnectionViewModel(application: Application) : AndroidViewModel(applic
         }
     }
 
-    fun connectDevice(scanResult: ScanResult) {
-        repo.setConnection(scanResult)
-    }
-
-
-    fun disconnectConnection(){
-        repo.disconnectBle()
-    }
 
     override fun onCleared() {
         super.onCleared()

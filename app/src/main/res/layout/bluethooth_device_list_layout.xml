@@ -24,24 +24,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/connect_ble_pb"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginTop="2dp"
-                android:visibility="gone"
-                android:layout_marginEnd="10dp"
-                android:indeterminate="true"
-                app:layout_constraintTop_toTopOf="parent"
-                app:trackCornerRadius="20dp" />
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recycle_view_ble"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                app:layout_constraintBottom_toTopOf="@id/connect_btn"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -76,28 +64,6 @@
                 app:layout_constraintTop_toBottomOf="@id/pb_ble"
                 tools:text="dgflk khlfdhdl fhklgfl fhlhlkfhkldfhlfhkldfhlk" />
 
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/connect_btn"
-                style="@style/Widget.Material3.Button.ElevatedButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="-4dp"
-                android:backgroundTint="@color/md_theme_dark_inversePrimary"
-                android:padding="15dp"
-                android:text="@string/con_btn"
-                android:textColor="@color/md_theme_light_onSecondary"
-                android:textSize="18sp"
-                android:visibility="gone"
-                app:cornerRadius="0dp"
-                app:icon="@drawable/ic_forward_arrow"
-                app:iconGravity="textEnd"
-                app:iconSize="30dp"
-                app:iconTint="@color/md_theme_light_onSecondary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                tools:visibility="visible" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

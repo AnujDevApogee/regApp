@@ -2,14 +2,9 @@ package com.apogee.registration.repository
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
-import android.content.Context
 import android.util.Log
 import com.apogee.registration.model.BleDeviceConnection
 import com.apogee.registration.utils.DataResponse
@@ -23,17 +18,15 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
 class BleDeviceConnectionRepository(
-    private val bluetoothAdapter: BluetoothAdapter, private val context: Context
+    private val bluetoothAdapter: BluetoothAdapter
 ) {
 
-    private lateinit var gatt: BluetoothGatt
 
     private val _bleConnection =
         MutableStateFlow<DataResponse<out Any?>>(DataResponse.Loading(null))
     val bleConnection: StateFlow<DataResponse<out Any?>>
         get() = _bleConnection
 
-    private var isScanning = true
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -75,30 +68,6 @@ class BleDeviceConnectionRepository(
     }
 
 
-    private val gattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(gatt: BluetoothGatt, status: Int, newState: Int) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                if (newState == BluetoothProfile.STATE_CONNECTED) {
-                    isScanning = false
-                    coroutineScope.launch {
-                        _bleConnection.value =
-                            (DataResponse.Success(
-                                BleDeviceConnection(
-                                    listOf(),
-                                    "Device Connected Successfully  ${getEmojiByUnicode(0x1F4E1)}",
-                                    BleDeviceConnection.Companion.BleDeviceStatus.CONNECTED.name
-                                )
-                            ))
-                    }
-                    gatt.discoverServices()
-                    this@BleDeviceConnectionRepository.gatt = gatt
-                }
-            }
-        }
-
-    }
-
-
     suspend fun startConnection() {
         try {
             _bleConnection.value =
@@ -115,53 +84,6 @@ class BleDeviceConnectionRepository(
             bleScanner.stopScan(scanCallback)
         } catch (e: Exception) {
             _bleConnection.value = (DataResponse.Error(null, e))
-        }
-    }
-
-
-    fun setConnection(result: ScanResult) {
-        coroutineScope.launch {
-            if (isScanning) {
-                _bleConnection.value = DataResponse.Success(
-                    BleDeviceConnection(
-                        listOf(),
-                        "",
-                        BleDeviceConnection.Companion.BleDeviceStatus.CONNECTING.name
-                    )
-                )
-                result.device.connectGatt(
-                    context, false, gattCallback, BluetoothDevice.TRANSPORT_LE
-                ) //, BluetoothDevice.TRANSPORT_LE
-                //BluetoothDevice.TRANSPORT_LE only if when you use normal device
-                bleScanner.stopScan(scanCallback)
-            } else {
-                _bleConnection.value = DataResponse.Success(
-                    BleDeviceConnection(
-                        listOf(),
-                        "Device is Already Connected.Please disconnect to device to establish new connection ${
-                            getEmojiByUnicode(
-                                0x1F4E1
-                            )
-                        }",
-                        BleDeviceConnection.Companion.BleDeviceStatus.CONNECTED.name
-                    )
-                )
-            }
-        }
-    }
-
-    fun disconnectBle() {
-        coroutineScope.launch {
-            bleScanner.stopScan(scanCallback)
-            gatt.close()
-            isScanning = true
-            _bleConnection.value = DataResponse.Success(
-                BleDeviceConnection(
-                    listOf(),
-                    "Device Is Disconnected. ${getEmojiByUnicode(0x1F4E1)}",
-                    BleDeviceConnection.Companion.BleDeviceStatus.DISCONNECT.name
-                )
-            )
         }
     }
 
