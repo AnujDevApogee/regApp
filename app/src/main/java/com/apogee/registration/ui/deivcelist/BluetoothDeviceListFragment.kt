@@ -19,6 +19,7 @@ import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
 import com.apogee.registration.utils.getEmojiByUnicode
 import com.apogee.registration.utils.hide
+import com.apogee.registration.utils.invisible
 import com.apogee.registration.utils.safeNavigate
 import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.show
@@ -131,6 +132,13 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
                 try {
                     bleAdaptor.notifyDataSetChanged()
                     bleAdaptor.submitList(data.list)
+                    if (data.list.isEmpty()){
+                        binding.pbBle.invisible()
+                        "No Device Available ${getEmojiByUnicode(0x1F6F0)}".apply {
+                            binding.msgPb.text=this
+                            binding.msgPb.show()
+                        }
+                    }
                 } catch (e: Exception) {
                     createLog("LOG_BLE_ADAPTOR", "TESTING  ${e.localizedMessage}")
                     dialog("Failed", e.localizedMessage ?: "Unknown error")

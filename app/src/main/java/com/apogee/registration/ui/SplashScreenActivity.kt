@@ -35,7 +35,7 @@ class SplashScreenActivity : AppCompatActivity() {
             .onExplainRequestReason { scope, deniedList ->
                 scope.showRequestReasonDialog(
                     deniedList,
-                    "Core fundamental are based on these permissions",
+                    "Registration App will not be able to work properly until you allow the permission",
                     "OK",
                     "Cancel"
                 )

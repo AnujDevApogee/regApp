@@ -8,6 +8,7 @@ import android.bluetooth.le.ScanSettings
 import android.util.Log
 import com.apogee.registration.model.BleDeviceConnection
 import com.apogee.registration.utils.DataResponse
+import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.getEmojiByUnicode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -50,18 +51,23 @@ class BleDeviceConnectionRepository(
                         true
                     )
                 * */
-                if (result != null && result.device?.name != null && result.device.address != null) {
-                    Log.i(
-                        "deviceNm", "onScanResult: ${result.device.name}  ${result.device.address}"
-                    )
-                    val res = deviceList.find {
-                        it.device.address == result.device.address
+                try {
+                    if (result != null && result.device?.name != null && result.device.address != null) {
+                        Log.i(
+                            "deviceNm",
+                            "onScanResult: ${result.device.name}  ${result.device.address}"
+                        )
+                        val res = deviceList.find {
+                            it.device.address == result.device.address
+                        }
+                        if (res == null) {
+                            deviceList.add(result)
+                        }
+                        //_bleConnection.value = DataResponse.Success(deviceList)
+                        //delay(1000)
                     }
-                    if (res == null) {
-                        deviceList.add(result)
-                    }
-                    //_bleConnection.value = DataResponse.Success(deviceList)
-                    //delay(1000)
+                } catch (e: Exception) {
+                    createLog("TAG_INFO", e.localizedMessage?:"Unknown error")
                 }
             }
         }

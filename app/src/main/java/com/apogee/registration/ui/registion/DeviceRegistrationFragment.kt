@@ -9,17 +9,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
-import com.apogee.blemodule.CommunicationLibrary.SerialService
 import com.apogee.registration.R
 import com.apogee.registration.databinding.DeviceRegistrationLayoutBinding
-import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion.Communcation.Connect
 import com.apogee.registration.user_case.DataConverter
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.calenderPicker
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
 import com.apogee.registration.viewmodel.BleDeviceCommunicationViewModel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class DeviceRegistrationFragment :
@@ -30,19 +27,6 @@ class DeviceRegistrationFragment :
     private val args: DeviceRegistrationFragmentArgs by navArgs()
 
     private val viewModel: BleDeviceCommunicationViewModel by viewModels()
-
-    private var isSubEdClicked = false
-
-    private var service: SerialService? = null
-
-    private var status = Connect.name
-
-
-    companion object {
-        enum class Communcation {
-            Connect, Disconnect, Write
-        }
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -81,7 +65,7 @@ class DeviceRegistrationFragment :
                 }
 
                 Write -> {
-//"log gpgst ontime 1"
+                  //"log gpgst ontime 1"
                   var imeiQuery = "$$$$,03,03,3,1,0,0000,####"
                       //"\$\$\$\$,08,D_342,02,1,NAVIK200-1.1_2330563,0000,####"
                     //"\$\$\$\$,05,01,tqTcT7hCtcHNG8Fg35zfDgjEDyLbN8gxCfYZVSttw/k=,0000,####"
