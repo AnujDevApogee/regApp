@@ -42,11 +42,12 @@ class LoginRepository(context: Context) : CustomCallback {
         coroutine.launch {
             try {
                 _loginResponse.value = DataResponse.Loading("Please Wait")
-                api.postDataWithBody(
+                api.postDataWithContentType(
                     loginRequest.setJsonObject(),
                     this@LoginRepository,
                     ApiUrl.loginUrl.first,
-                    ApiUrl.loginUrl.second
+                    ApiUrl.loginUrl.second,
+                    "application/json"
                 )
             } catch (e: Exception) {
                 _loginResponse.value = DataResponse.Error(null, e)
