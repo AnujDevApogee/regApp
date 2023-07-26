@@ -10,4 +10,17 @@
     <string name="con_btn">Connected</string>
     <string name="dis_btn">Disconnect</string>
     <string name="logout_desc">Are you sure you want to Logout</string>
+    <string-array name="model_ls">
+        <item>NAVIK200_1.1</item>
+        <item>TNAVIK50</item>
+        <item>NAVIK300_1.1</item>
+    </string-array>
+
+
+    <string-array name="model_name_ls">
+        <item>NAVIK200-1.1</item>
+        <item>NAVIK50-1.0_</item>
+        <item>NAVIK300_1.1</item>
+    </string-array>
+
 </resources>

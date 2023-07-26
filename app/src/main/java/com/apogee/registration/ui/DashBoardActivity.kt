@@ -11,7 +11,7 @@ import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.utils.BlueToothBroadCastReceiver
 import com.apogee.registration.utils.createLog
 
-class DashBoardActivity : AppCompatActivity() {
+class DashBoardActivity : AppCompatActivity(){
     private lateinit var binding: DashboardActivtyLayoutBinding
 
     private val bluTohAdaptor by lazy {
@@ -34,6 +34,7 @@ class DashBoardActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         showBluetoothEnableDialog()
+
     }
 
     private fun showBluetoothEnableDialog() {
