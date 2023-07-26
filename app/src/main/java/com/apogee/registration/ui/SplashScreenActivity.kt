@@ -25,27 +25,43 @@ class SplashScreenActivity : AppCompatActivity() {
         setContentView(binding.root)
         lifecycleScope.launch {
             delay(2000)
-            PermissionX.init(this@SplashScreenActivity).permissions(PermissionUtils.permissions)
-                .request { allGranted, grantedList, deniedList ->
-                    if (allGranted) {
-                        goToNextActivity<DashBoardActivity>(true)
-                        /*RegistrationAppSharedPref.getInstance(this@SplashScreenActivity).also {
-                            createLog("TAG_LOGIN", "${it.getLoginResponse()}")
-                            if (it.getLoginResponse() == null || it.getLoginResponse()!!.data.isNullOrEmpty()) {
-                                goToNextActivity<LoginActivity>(true)
-                            } else {
-                                goToNextActivity<DashBoardActivity>(true)
-                            }
-                        }*/
-                    } else {
-                        Toast.makeText(
-                            this@SplashScreenActivity,
-                            "These permissions are denied: $deniedList",
-                            Toast.LENGTH_LONG
-                        ).show()
-                    }
-                }
+            getToPermission()
         }
 
+    }
+
+    private fun getToPermission() {
+        PermissionX.init(this@SplashScreenActivity).permissions(PermissionUtils.permissions)
+            .onExplainRequestReason { scope, deniedList ->
+                scope.showRequestReasonDialog(
+                    deniedList,
+                    "Core fundamental are based on these permissions",
+                    "OK",
+                    "Cancel"
+                )
+            }
+            .onForwardToSettings { scope, deniedList ->
+                scope.showForwardToSettingsDialog(
+                    deniedList,
+                    "You need to allow necessary permissions in Settings manually",
+                    "OK",
+                    "Cancel"
+                )
+            }
+            .request { allGranted, grantedList, deniedList ->
+                if (allGranted) {
+                    goToNextActivity<DashBoardActivity>(true)
+                    /*RegistrationAppSharedPref.getInstance(this@SplashScreenActivity).also {
+                        createLog("TAG_LOGIN", "${it.getLoginResponse()}")
+                        if (it.getLoginResponse() == null || it.getLoginResponse()!!.data.isNullOrEmpty()) {
+                            goToNextActivity<LoginActivity>(true)
+                        } else {
+                            goToNextActivity<DashBoardActivity>(true)
+                        }
+                    }*/
+                } else {
+                    getToPermission()
+                }
+            }
     }
 }
