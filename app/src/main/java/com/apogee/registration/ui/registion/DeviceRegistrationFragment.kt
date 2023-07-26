@@ -1,6 +1,5 @@
 package com.apogee.registration.ui.registion
 
-import android.bluetooth.BluetoothAdapter
 import android.content.ComponentName
 import android.content.Intent
 import android.content.ServiceConnection
@@ -17,9 +16,14 @@ import com.apogee.blemodule.CommunicationLibrary.SerialSocket
 import com.apogee.registration.R
 import com.apogee.registration.databinding.DeviceRegistrationLayoutBinding
 import com.apogee.registration.instance.BluetoothCommunication
+import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion.Communcation.Connect
+import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion.Communcation.Disconnect
+import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion.Communcation.Write
+import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion.Communcation.valueOf
 import com.apogee.registration.utils.calenderPicker
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
+import com.apogee.registration.utils.newline_crlf
 import com.apogee.registration.utils.showToastMsg
 
 class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout),ServiceConnection,SerialListener {
@@ -31,6 +35,16 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     private var isSubEdClicked = false
 
     private var service: SerialService? = null
+
+    private var status = Connect.name
+
+    companion object {
+        enum class Communcation {
+            Connect,
+            Disconnect,
+            Write
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -47,23 +61,52 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         )
         binding.submitBtn.setOnClickListener {
             //showToastMsg(binding.modelNo.text.toString())
-            try {
-                val bluetoothAdapter = BluetoothCommunication(requireContext()).getBluetoothAdaptor()
-                val device = bluetoothAdapter.getRemoteDevice(args.macaddress)
-               // connected = Connected.Pending
-                val socket = SerialSocket(activity?.applicationContext, device)
-                service!!.connect(socket)
-            } catch (e: java.lang.Exception) {
-                onSerialConnectError(e)
+            when (valueOf(status)) {
+                Connect -> {
+                    try {
+                        val bluetoothAdapter =
+                            BluetoothCommunication(requireContext()).getBluetoothAdaptor()
+                        val device = bluetoothAdapter.getRemoteDevice(args.macaddress)
+                        // connected = Connected.Pending
+                        val socket = SerialSocket(activity?.applicationContext, device)
+                        service!!.connect(socket)
+                    } catch (e: java.lang.Exception) {
+                        onSerialConnectError(e)
+                    }
+                }
+
+                Disconnect -> {
+                    service?.disconnect()
+                }
+
+                Write -> {
+
+                  /*  val s = "b562068a090000010000bc0091200f16df"
+                    val ans = ByteArray(s.length / 2)
+
+                    println("Hex String : $s")
+
+                    for (i in ans.indices) {
+                        val index = i * 2
+
+                        // Using parseInt() method of Integer class
+                        val `val` = s.substring(index, index + 2).toInt(16)
+                        ans[i] = `val`.toByte()
+                    }
+*/
+                  var imeiQuery ="$$$$,03,03,3,1,0,0000,####"
+                    imeiQuery += newline_crlf
+                    service?.write(imeiQuery.toByteArray())
+                }
             }
-         /*   try {
-                val bleAdaptor=BluetoothAdapter.getDefaultAdapter()//BluetoothCommunication(requireContext()).getBluetoothAdaptor()
-                val device=bleAdaptor.getRemoteDevice(args.macaddress)
-                val service=SerialSocket(requireContext(),device)
-                this.service?.connect(service)
-            }catch (e:Exception){
-                this.service?.onSerialConnectError(e)
-            }*/
+            /*   try {
+                   val bleAdaptor=BluetoothAdapter.getDefaultAdapter()//BluetoothCommunication(requireContext()).getBluetoothAdaptor()
+                   val device=bleAdaptor.getRemoteDevice(args.macaddress)
+                   val service=SerialSocket(requireContext(),device)
+                   this.service?.connect(service)
+               }catch (e:Exception){
+                   this.service?.onSerialConnectError(e)
+               }*/
         }
     }
 
@@ -119,6 +162,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     }
 
     override fun onSerialConnect() {
+        status = Write.name
         showToastMsg("Connected")
     }
 

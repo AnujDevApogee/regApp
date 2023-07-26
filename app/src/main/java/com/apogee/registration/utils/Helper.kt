@@ -33,6 +33,8 @@ object ApiUrl {
     val loginProjectName = "RegistrationCumAllotment"
 }
 
+var newline_crlf = "\r\n"
+
 fun View.hide() {
     this.isVisible = false
 }
