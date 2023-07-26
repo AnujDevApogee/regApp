@@ -28,14 +28,15 @@ class SplashScreenActivity : AppCompatActivity() {
             PermissionX.init(this@SplashScreenActivity).permissions(PermissionUtils.permissions)
                 .request { allGranted, grantedList, deniedList ->
                     if (allGranted) {
-                        RegistrationAppSharedPref.getInstance(this@SplashScreenActivity).also {
+                        goToNextActivity<DashBoardActivity>(true)
+                        /*RegistrationAppSharedPref.getInstance(this@SplashScreenActivity).also {
                             createLog("TAG_LOGIN", "${it.getLoginResponse()}")
                             if (it.getLoginResponse() == null || it.getLoginResponse()!!.data.isNullOrEmpty()) {
                                 goToNextActivity<LoginActivity>(true)
                             } else {
                                 goToNextActivity<DashBoardActivity>(true)
                             }
-                        }
+                        }*/
                     } else {
                         Toast.makeText(
                             this@SplashScreenActivity,

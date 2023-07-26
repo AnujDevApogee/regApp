@@ -1,6 +1,5 @@
 package com.apogee.registration.repository
 
-import android.bluetooth.BluetoothAdapter
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -9,6 +8,8 @@ import android.os.IBinder
 import androidx.appcompat.app.AppCompatActivity
 import com.apogee.blemodule.CommunicationLibrary.SerialListener
 import com.apogee.blemodule.CommunicationLibrary.SerialService
+import com.apogee.blemodule.CommunicationLibrary.SerialSocket
+import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.createLog
 import kotlinx.coroutines.CoroutineScope
@@ -17,9 +18,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
 class BleDeviceCommunicationRepository(
-    private val bleAdaptor: BluetoothAdapter,
-    private val context: Context
+    bleAdaptor: BluetoothCommunication, private val context: Context
 ) : ServiceConnection, SerialListener {
+
+
+    private var service: SerialService? = null
+
+
+    private val bluetoothAdaptor by lazy {
+        bleAdaptor.getBluetoothAdaptor()
+    }
+
 
     private val _data = MutableStateFlow<DataResponse<out Any>?>(null)
     val data: MutableStateFlow<DataResponse<out Any>?>
@@ -30,50 +39,103 @@ class BleDeviceCommunicationRepository(
 
 
     fun setUpConnection() {
-        context.bindService(
-            Intent(context, SerialService::class.java), this,
-            AppCompatActivity.BIND_AUTO_CREATE
-        )
+        coroutineScope.launch {
+            _data.value = DataResponse.Loading("Please Wait Setup..")
+            context.bindService(
+                Intent(context, SerialService::class.java),
+                this@BleDeviceCommunicationRepository,
+                AppCompatActivity.BIND_AUTO_CREATE
+            )
+        }
     }
 
     fun connect(macAddress: String) {
         coroutineScope.launch {
+            try {
+                val device = bluetoothAdaptor.getRemoteDevice(macAddress)
+                val socket = SerialSocket(context, device)
+                service!!.connect(socket)
+            } catch (e: java.lang.Exception) {
+                onSerialConnectError(e)
+            }
+        }
+    }
 
+
+    fun disconnect() {
+        coroutineScope.launch {
+            try {
+                service!!.disconnect()
+                _data.value = DataResponse.Success("Disconnect with Device")
+            } catch (e: Exception) {
+                _data.value = DataResponse.Error(null, e)
+            }
+        }
+    }
+
+
+    fun sendRequest(byteArray: ByteArray) {
+        coroutineScope.launch {
+            try {
+                service!!.write(byteArray)
+                _data.value = DataResponse.Loading("Sending Request")
+            }catch (e:Exception){
+                _data.value=DataResponse.Error(null,e)
+            }
         }
     }
 
 
     override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-
+        coroutineScope.launch {
+            _data.value = DataResponse.Success("Open of Connection..")
+        }
     }
 
     override fun onServiceDisconnected(p0: ComponentName?) {
-        TODO("Not yet implemented")
+        coroutineScope.launch {
+            _data.value = DataResponse.Success("Disconnected with Service")
+        }
     }
 
     override fun onSerialConnect() {
-        createLog("TAG_CONNECT","Connected")
+        createLog("TAG_CONNECT", "Connected")
+        coroutineScope.launch {
+            _data.value = DataResponse.Success("Device is Connected")
+        }
     }
 
     override fun onSerialConnectError(p0: Exception?) {
-        TODO("Not yet implemented")
+        coroutineScope.launch {
+            val err = if (p0 == null) "Unknown Error for While Initialing Service" else null
+            _data.value = DataResponse.Error(err, p0)
+        }
     }
 
     override fun onSerialNmeaRead(p0: String?) {
-        TODO("Not yet implemented")
+        createLog("TAG_NMEA", "NMEA STRING -->  $p0")
     }
 
     override fun onSerialProtocolRead(p0: String?) {
-        TODO("Not yet implemented")
+        createLog("TAG_PROTOCOL", "Protocol String $p0")
     }
 
     override fun onSerialResponseRead(p0: ByteArray?) {
-        TODO("Not yet implemented")
+        if (p0 != null) {
+            createLog("TAG_READ_RESPONSE", String(p0))
+        }
     }
 
     override fun onSerialIoError(p0: Exception?) {
-        TODO("Not yet implemented")
+        coroutineScope.launch {
+            val err = if (p0 == null) "Unknown Error for While Initialing Service" else null
+            _data.value = DataResponse.Error(err, p0)
+        }
     }
 
+
+    fun disconnectService() {
+        context.stopService(Intent(context, SerialService::class.java))
+    }
 
 }
