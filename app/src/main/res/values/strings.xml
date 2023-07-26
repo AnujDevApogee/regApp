@@ -9,6 +9,13 @@
     <string name="login_res">Logout</string>
     <string name="con_btn">Connected</string>
     <string name="dis_btn">Disconnect</string>
+    <string name="manfacture_name">Manufacture Name</string>
+    <string name="device_type">Device Type</string>
+    <string name="model_name">Model Name</string>
+    <string name="model_no">Model No</string>
+    <string name="sub_date">Subscription Date</string>
+    <string name="sub_date_month">mm/yy/dd</string>
+    <string name="dn_btn">Confirm</string>
     <string name="logout_desc">Are you sure you want to Logout</string>
     <string-array name="model_ls">
         <item>NAVIK200_1.1</item>
