@@ -20,6 +20,7 @@ import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion
 import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion.Communcation.Disconnect
 import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion.Communcation.Write
 import com.apogee.registration.ui.registion.DeviceRegistrationFragment.Companion.Communcation.valueOf
+import com.apogee.registration.user_case.DataConverter
 import com.apogee.registration.utils.calenderPicker
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
@@ -119,15 +120,11 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             setAdapter(setAdaptor(R.array.model_name_ls))
         }
         binding.subscriptionDate.setOnClickListener {
-            if (!isSubEdClicked) {
                 calenderPicker(parentFragmentManager, {
                 }, {
                     binding.subscriptionDate.setText(it)
+                    createLog("TAG_INFO", "${DataConverter.getConvertDate(it)}")
                 })
-            } else {
-                showToastMsg("opening the Calender Picker")
-            }
-            isSubEdClicked = !isSubEdClicked
         }
     }
 

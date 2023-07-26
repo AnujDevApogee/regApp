@@ -158,7 +158,7 @@ fun calenderPicker(
     datePicker.addOnPositiveButtonClickListener { time ->
         val calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
         calendar.timeInMillis = time
-        val format = SimpleDateFormat("dd-MM-yyyy")//"yyyy-MM-dd"
+        val format = SimpleDateFormat("dd/MM/yyyy")//"yyyy-MM-dd"
         val formattedDate: String = format.format(calendar.time)
         dateListener.invoke(formattedDate)
     }
