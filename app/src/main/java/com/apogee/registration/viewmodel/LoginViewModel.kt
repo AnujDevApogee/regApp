@@ -17,13 +17,18 @@ import kotlinx.coroutines.launch
 
 class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
-    private var repository = LoginRepository()
-
     private val app = application
+    private var repository = LoginRepository(application)
+
 
     private val _loginResponse = MutableLiveData<DataResponse<out Any?>>()
     val loginResponse: LiveData<DataResponse<out Any?>>
         get() = _loginResponse
+
+
+    private val _saveCredentials = MutableLiveData<Pair<Pair<String, String>, Boolean>>()
+    val saveCredentials: LiveData<Pair<Pair<String, String>, Boolean>>
+        get() = _saveCredentials
 
 
     private val _event = MutableLiveData<Event<String>>()
@@ -31,12 +36,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         get() = _event
 
 
-    fun loginUser(email: String?, password: String?) {
+    fun loginUser(username: String?, password: String?, isRemember: Boolean) {
         if (!app.isNetworkAvailable()) {
             _event.postValue(Event("No Internet Connection"))
             return
         }
-        if (checkVaildString(email)) {
+        if (checkVaildString(username)) {
             _event.postValue(Event("InValid Email id"))
             return
         }
@@ -46,15 +51,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
 
         viewModelScope.launch {
-            repository.validateUser(
-                LoginRequest(
-                    password = password!!,
-                    username = email!!,
-                    projectName = ApiUrl.loginProjectName
-                )
+            val request = LoginRequest(
+                password = password!!,
+                username = username!!,
+                projectName = ApiUrl.loginProjectName
             )
+            repository.validateUser(
+                request
+            )
+            repository.saveCredentials(request, isRemember)
         }
-
     }
 
     init {
@@ -69,6 +75,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+
+    fun getLoginResponse() {
+        viewModelScope.launch {
+            repository.getSaveCredentials().let { res ->
+                if (res.second && !checkVaildString(res.first.first) && !checkVaildString(res.first.second)) {
+                    _saveCredentials.postValue(res)
+                }
+            }
+        }
+    }
 
     override fun onCleared() {
         super.onCleared()

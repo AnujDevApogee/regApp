@@ -8,8 +8,10 @@ import com.apogee.registration.databinding.LoginActivityLayoutBinding
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.closeKeyboard
 import com.apogee.registration.utils.createLog
+import com.apogee.registration.utils.goToNextActivity
 import com.apogee.registration.utils.invisible
 import com.apogee.registration.utils.openKeyBoard
+import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.show
 import com.apogee.registration.viewmodel.LoginViewModel
 
@@ -23,22 +25,33 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = LoginActivityLayoutBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        openKeyBoard(binding.userNm)
 
         viewModel.event.observe(this) {
             it.getContentIfNotHandled()?.let { msg ->
                 createLog("Login_res", msg)
+                dialog("Failed",msg)
             }
         }
 
+        viewModel.getLoginResponse()
+        getSavedResponse()
         getLoginResponse()
 
         binding.loginBtn.setOnClickListener {
-            val email = binding.userNm.text.toString()
+            val username = binding.userNm.text.toString()
             val pass = binding.passWord.text.toString()
-            viewModel.loginUser(email, pass)
+            val isRemember = binding.rememberMe.isChecked
+            viewModel.loginUser(username, pass, isRemember)
         }
 
+    }
+
+    private fun getSavedResponse() {
+        viewModel.saveCredentials.observe(this) {
+            binding.userNm.setText(it.first.first)
+            binding.passWord.setText(it.first.second)
+            binding.rememberMe.isChecked = it.second
+        }
     }
 
     private fun getLoginResponse() {
@@ -48,10 +61,14 @@ class LoginActivity : AppCompatActivity() {
                     createLog(
                         "LOGIN_RES", "Error ${it.data} and Exp ${it.exception?.localizedMessage}"
                     )
+                    var err = (it.data as String?) ?: ""
+                    err += (it.exception?.localizedMessage) ?: ""
+                    dialog("Failed", err)
                     hidePb()
                 }
 
                 is DataResponse.Loading -> {
+                    createLog("LOGIN_RES", " LOADING ${it.data} ")
                     it.data?.let {
                         showPb()
                     }
@@ -60,6 +77,7 @@ class LoginActivity : AppCompatActivity() {
                 is DataResponse.Success -> {
                     createLog("LOGIN_RES", "Success ${it.data}")
                     hidePb()
+                    goToNextActivity<DashBoardActivity>(true)
                 }
             }
         }
@@ -67,7 +85,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun hidePb() {
         binding.loginBtn.show()
-        binding.pb.isVisible=false
+        binding.pb.isVisible = false
     }
 
     private fun showPb() {
@@ -75,7 +93,18 @@ class LoginActivity : AppCompatActivity() {
         binding.loginBtn.invisible()
     }
 
+    private fun dialog(title: String, msg: String) {
+        setUpDialogBox(title, msg, "ok", success = {
 
+        }, cancelListener = {
+
+        })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        openKeyBoard(binding.userNm)
+    }
 
 
     override fun onPause() {

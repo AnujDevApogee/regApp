@@ -21,18 +21,18 @@ class RegistrationAppSharedPref(private val context: Context) {
     }
 
     private val loginXML = "LOGIN_DETAIL"
-    private val email = "Email"
+    private val username = "UserName"
     private val pass = "Password"
-    private val remember = "Password"
+    private val remember = "Remember"
 
     private val loginResponse = "Login_Response"
     private val sharedLoginPref by lazy {
         context.getSharedPreferences(loginXML, Context.MODE_PRIVATE)
     }
 
-    fun saveUserNameAndPassword(email: String, pass: String, remember: Boolean) {
+    fun saveUserNameAndPassword(username: String, pass: String, remember: Boolean) {
         val edit = sharedLoginPref.edit()
-        edit.putString(this.email, email)
+        edit.putString(this.username, username)
         edit.putString(this.pass, pass)
         edit.putBoolean(this.remember, remember)
         edit.apply()
@@ -49,7 +49,7 @@ class RegistrationAppSharedPref(private val context: Context) {
     fun getLoginCredential(): Pair<Pair<String, String>, Boolean> {
         return Pair(
             Pair(
-                sharedLoginPref.getString(email, "") ?: "",
+                sharedLoginPref.getString(username, "") ?: "",
                 sharedLoginPref.getString(pass, "") ?: ""
             ), sharedLoginPref.getBoolean(remember, false)
         )
@@ -57,6 +57,12 @@ class RegistrationAppSharedPref(private val context: Context) {
 
     fun getLoginResponse(): LoginResponse? {
         return deserializeFromJson<LoginResponse>(sharedLoginPref.getString(loginResponse, "{}"))
+    }
+
+    fun logout(): Boolean {
+        val edit=sharedLoginPref.edit()
+        edit.putString(loginResponse,null)
+        return edit.commit()
     }
 
 }

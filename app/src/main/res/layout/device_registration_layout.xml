@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/md_theme_light_onPrimary"
+    android:orientation="vertical"
+    tools:context="com.apogee.registration.ui.registion.DeviceRegistrationFragment">
+
+    <include
+        android:id="@+id/action_layout"
+        layout="@layout/action_bar_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/ble_nm_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:textColorHint="@color/md_theme_light_scrim"
+        app:boxStrokeColor="@color/md_theme_light_scrim"
+        app:boxStrokeWidthFocused="2dp"
+        app:endIconTint="@color/md_theme_light_scrim"
+        app:hintTextColor="@color/md_theme_light_scrim"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/action_layout"
+        app:startIconDrawable="@drawable/ic_device">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/ble_nme"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:editable="false"
+            android:inputType="none" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/manufacturer_nm_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="@string/manfacture_name"
+        app:boxStrokeColor="@color/md_theme_light_primary"
+        app:layout_constraintLeft_toLeftOf="@id/ble_nm_layout"
+        app:layout_constraintRight_toRightOf="@id/ble_nm_layout"
+        app:layout_constraintTop_toBottomOf="@id/ble_nm_layout">
+
+        <AutoCompleteTextView
+            android:id="@+id/manufacturer_ls"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:inputType="none"
+            tools:text="Select" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/device_nm_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="@string/device_type"
+        app:boxStrokeColor="@color/md_theme_light_primary"
+        app:layout_constraintLeft_toLeftOf="@id/manufacturer_nm_layout"
+        app:layout_constraintRight_toRightOf="@id/manufacturer_nm_layout"
+        app:layout_constraintTop_toBottomOf="@id/manufacturer_nm_layout">
+
+        <AutoCompleteTextView
+            android:id="@+id/device_ls"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:inputType="none"
+            tools:text="Select" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/model_name_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="@string/model_name"
+        app:boxStrokeColor="@color/md_theme_light_primary"
+        app:layout_constraintLeft_toLeftOf="@id/device_nm_layout"
+        app:layout_constraintRight_toRightOf="@id/device_nm_layout"
+        app:layout_constraintTop_toBottomOf="@id/device_nm_layout">
+
+        <AutoCompleteTextView
+            android:id="@+id/model_name_ls"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:inputType="none"
+            tools:text="Select" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/model_no_layout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="@string/model_no"
+        app:boxStrokeColor="@color/md_theme_light_primary"
+        app:layout_constraintLeft_toLeftOf="@id/model_name_layout"
+        app:layout_constraintRight_toRightOf="@id/model_name_layout"
+        app:layout_constraintTop_toBottomOf="@id/model_name_layout">
+
+        <AutoCompleteTextView
+            android:id="@+id/model_no"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:inputType="none"
+            tools:text="Select" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/subsciption_date"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:textColorHint="@color/md_theme_light_scrim"
+        app:boxStrokeColor="@color/md_theme_light_scrim"
+        app:boxStrokeWidthFocused="2dp"
+        app:endIconTint="@color/md_theme_light_scrim"
+        app:hintTextColor="@color/md_theme_light_scrim"
+        app:layout_constraintLeft_toLeftOf="@id/model_no_layout"
+        app:layout_constraintRight_toRightOf="@id/model_no_layout"
+        app:layout_constraintTop_toBottomOf="@id/model_no_layout">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/subscription_date"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:editable="false"
+            android:hint="@string/sub_date_month"
+            android:inputType="none" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/submit_btn"
+        style="@style/Widget.Material3.Button.ElevatedButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="-4dp"
+        android:backgroundTint="@color/md_theme_dark_inversePrimary"
+        android:padding="15dp"
+        android:text="@string/dn_btn"
+        android:textColor="@color/md_theme_light_onSecondary"
+        android:textSize="15sp"
+        app:cornerRadius="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -39,8 +39,9 @@ android {
 }
 
 dependencies {
-
-    implementation files('libs\\ApiLibrary.jar')
+    
+    implementation files('libs\\ApiModule.jar')
+    implementation files('libs\\BleModule.jar')
     def fragment_version = "1.5.7"
     def activity_version = "1.7.2"
     def nav_version = "2.6.0"
@@ -87,6 +88,6 @@ dependencies {
     implementation 'com.google.android.material:material:1.11.0-alpha01'
     //Permission
     implementation 'com.guolindev.permissionx:permissionx:1.7.1'
-
-
+    //Swipe Layout
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 }

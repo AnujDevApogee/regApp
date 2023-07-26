@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/deviceListFragment">
+
+    <fragment
+        android:id="@+id/deviceListFragment"
+        android:name="com.apogee.registration.ui.deivcelist.BluetoothDeviceListFragment"
+        android:label="bluethooth_device_list_layout"
+        tools:layout="@layout/bluethooth_device_list_layout" >
+        <action
+            android:id="@+id/action_deviceListFragment_to_deviceRegistrationFragment"
+            app:destination="@id/deviceRegistrationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/deviceRegistrationFragment"
+        android:name="com.apogee.registration.ui.registion.DeviceRegistrationFragment"
+        android:label="device_registration_layout"
+        tools:layout="@layout/device_registration_layout" >
+        <argument
+            android:name="devicename"
+            app:argType="string" />
+        <argument android:name="macaddress"
+            app:argType="string" />
+    </fragment>
+</navigation>
