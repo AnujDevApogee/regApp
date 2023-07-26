@@ -80,21 +80,11 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                 }
 
                 Write -> {
-
-                  /*  val s = "b562068a090000010000bc0091200f16df"
-                    val ans = ByteArray(s.length / 2)
-
-                    println("Hex String : $s")
-
-                    for (i in ans.indices) {
-                        val index = i * 2
-
-                        // Using parseInt() method of Integer class
-                        val `val` = s.substring(index, index + 2).toInt(16)
-                        ans[i] = `val`.toByte()
-                    }
-*/
-                  var imeiQuery ="$$$$,03,03,3,1,0,0000,####"
+//"log gpgst ontime 1"
+                  var imeiQuery = "$$$$,03,03,3,1,0,0000,####"
+                      //"\$\$\$\$,08,D_342,02,1,NAVIK200-1.1_2330563,0000,####"
+                    //"\$\$\$\$,05,01,tqTcT7hCtcHNG8Fg35zfDgjEDyLbN8gxCfYZVSttw/k=,0000,####"
+                      //"\$\$\$\$,04,0,9,D_342,P_45643,120.138.10.146,8060,45.114.142.35,8060,12,60,4784208,0000,####"//
                     imeiQuery += newline_crlf
                     service?.write(imeiQuery.toByteArray())
                 }
@@ -171,12 +161,26 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         createLog("TAG_ble"," connection Error ${p0?.localizedMessage}")
     }
 
-    override fun onSerialRead(p0: ByteArray?) {
+    override fun onSerialNmeaRead(p0: String?) {
+        createLog("TAG_NMEA","$p0")
+    }
+
+    override fun onSerialProtocolRead(p0: String?) {
+        createLog("TAG_PROCTOCAL","$p0")
+    }
+
+    override fun onSerialResponseRead(p0: ByteArray?) {
+        p0?.let {
+            createLog("TAG_SERIAL", String(p0))
+        }
+    }
+
+   /* override fun onSerialRead(p0: ByteArray?) {
       p0?.let {
           val string= String(p0)
           createLog("TAG_ble","Response -> $string")
       }
-    }
+    }*/
 
     override fun onSerialIoError(p0: Exception?) {
         createLog("TAG_ble","Error -> ${p0?.localizedMessage}")

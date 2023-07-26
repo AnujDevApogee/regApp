@@ -39,9 +39,9 @@ android {
 }
 
 dependencies {
-
-    implementation files('libs\\BleModule.jar')
+    
     implementation files('libs\\ApiModule.jar')
+    implementation files('libs\\BleModule.jar')
     def fragment_version = "1.5.7"
     def activity_version = "1.7.2"
     def nav_version = "2.6.0"
