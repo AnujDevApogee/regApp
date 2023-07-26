@@ -16,9 +16,16 @@ import android.widget.Toast
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
+import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.DateValidatorPointForward
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.gson.Gson
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.TimeZone
 
 
 object ApiUrl {
@@ -125,4 +132,33 @@ fun NavController.safeNavigate(direction: Int) {
     currentDestination?.getAction(direction)?.run {
         navigate(direction)
     }
+}
+
+
+fun calenderPicker(
+    fragmentManager: FragmentManager, cancel: () -> Unit, dateListener: (txt: String) -> Unit
+) {
+    val constraint = CalendarConstraints.Builder().setValidator(DateValidatorPointForward.now())
+    val datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select Booking Date")
+        .setCalendarConstraints(constraint.build()).build()
+
+
+    datePicker.addOnCancelListener {
+        cancel.invoke()
+        it.dismiss()
+    }
+
+    datePicker.addOnDismissListener {
+        cancel.invoke()
+        it.dismiss()
+    }
+
+    datePicker.addOnPositiveButtonClickListener { time ->
+        val calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        calendar.timeInMillis = time
+        val format = SimpleDateFormat("dd-MM-yyyy")//"yyyy-MM-dd"
+        val formattedDate: String = format.format(calendar.time)
+        dateListener.invoke(formattedDate)
+    }
+    datePicker.show(fragmentManager, "DatePicker")
 }

@@ -138,7 +138,6 @@
         android:textColorHint="@color/md_theme_light_scrim"
         app:boxStrokeColor="@color/md_theme_light_scrim"
         app:boxStrokeWidthFocused="2dp"
-        app:endIconMode="clear_text"
         app:endIconTint="@color/md_theme_light_scrim"
         app:hintTextColor="@color/md_theme_light_scrim"
         app:layout_constraintLeft_toLeftOf="@id/model_no_layout"
@@ -150,6 +149,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:editable="false"
             android:hint="@string/sub_date_month"
             android:inputType="none" />
 
