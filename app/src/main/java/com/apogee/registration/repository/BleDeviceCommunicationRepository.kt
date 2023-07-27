@@ -15,6 +15,7 @@ import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
 import com.apogee.registration.user_case.ImeiNumber
 import com.apogee.registration.user_case.TimeCompare
+import com.apogee.registration.utils.BleHelper.DEVICEREGRECORD
 import com.apogee.registration.utils.BleHelper.IEMINUMBER
 import com.apogee.registration.utils.BleHelper.valueOf
 import com.apogee.registration.utils.DataResponse
@@ -25,7 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.io.IOException
 
 class BleDeviceCommunicationRepository(
     bleAdaptor: BluetoothCommunication, private val context: Context
@@ -55,7 +55,7 @@ class BleDeviceCommunicationRepository(
     fun setUpConnection() {
         coroutineScope.launch {
             _data.value =
-                DataResponse.Loading(BleLoadingStatus.BleSetUpConnection("Please Wait Setup connection.."))
+                DataResponse.Loading(BleLoadingStatus.BleSetUpConnectionLoading("Please Wait Setup connection.."))
             context.bindService(
                 Intent(context, SerialService::class.java),
                 this@BleDeviceCommunicationRepository,
@@ -71,7 +71,7 @@ class BleDeviceCommunicationRepository(
                 val socket = SerialSocket(context, device)
                 service!!.connect(socket)
                 _data.value =
-                    DataResponse.Loading(BleLoadingStatus.BleConnectDevice("Please Wait connection with device"))
+                    DataResponse.Loading(BleLoadingStatus.BleConnectDeviceLoading("Please Wait connection with device"))
             } catch (e: Exception) {
                 onSerialConnectError(e)
             }
@@ -96,10 +96,12 @@ class BleDeviceCommunicationRepository(
             try {
                 bleStatus = status
                 timerStart = System.currentTimeMillis()
-                when (valueOf(bleStatus!!)) {
+                _data.value = when (valueOf(bleStatus!!)) {
                     IEMINUMBER -> {
-                        _data.value =
                             DataResponse.Loading(BleLoadingStatus.ImeiNumberLoading("Please Wait Check For Imei Number"))
+                    }
+                    DEVICEREGRECORD -> {
+                         DataResponse.Loading(BleLoadingStatus.BleDeviceRegRecordLoading("Please Wait For ${String(byteArray)}"))
                     }
                 }
                 delay(200)
@@ -111,6 +113,12 @@ class BleDeviceCommunicationRepository(
                 } else {
                     when (valueOf(bleStatus!!)) {
                         IEMINUMBER -> DataResponse.Error(BleErrorStatus.BleImeiError(null, e), null)
+                        DEVICEREGRECORD -> {
+                            DataResponse.Error(
+                                BleErrorStatus.BleDeviceRegRecordError(null, e),
+                                null
+                            )
+                        }
                     }
                 }
             }
@@ -177,7 +185,7 @@ class BleDeviceCommunicationRepository(
                                     if (!checkVaildString(res)) {
                                         ImeiNumber.getImeiNumber(res!!)?.let {
                                             _data.value = DataResponse.Success(
-                                                BleSuccessStatus.BleImeiNumber(it)
+                                                BleSuccessStatus.BleImeiNumberSuccess(it)
                                             )
                                             timerStart = -1
                                         }
@@ -202,6 +210,10 @@ class BleDeviceCommunicationRepository(
                             }
                         }
                         //createLog("TAG_PROTOCOL", "Protocol String IEMI_NUMBER $res")
+                    }
+
+                    DEVICEREGRECORD -> {
+                        createLog("TAG_PROTOCOL","DEVICE_REG_REG $res")
                     }
                 }
             }

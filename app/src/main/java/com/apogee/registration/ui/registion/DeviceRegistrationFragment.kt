@@ -128,6 +128,11 @@ class DeviceRegistrationFragment :
                                     "BLE_INFO",
                                     "DEVICE SUB_DATE API Success is ${it.data}"
                                 )
+
+                                viewModel.sendRequest(
+                                    it.data as String,
+                                    BleHelper.DEVICEREGRECORD.name
+                                )
                             }
                         }
                     }
@@ -223,9 +228,10 @@ class DeviceRegistrationFragment :
                     "BLE_INFO",
                     "Ble Connection Success -> ${data.data} "
                 )
-                viewModel.sendRequest(BleCmd.imeiNumber,BleHelper.IEMINUMBER.name)
+                viewModel.sendRequest(BleCmd.imeiNumber, BleHelper.IEMINUMBER.name)
             }
-            is BleSuccessStatus.BleImeiNumber -> {
+
+            is BleSuccessStatus.BleImeiNumberSuccess -> {
                 createLog(
                     "BLE_INFO",
                     "IMEI  Ble Connection Success-> ${data.data} "
@@ -236,6 +242,7 @@ class DeviceRegistrationFragment :
                     viewModel.sendDeviceReg(model)
                 } ?: showToastMsg("some thing went wrong try again!!")
             }
+
             is BleSuccessStatus.BleSetUpConnectionSuccess -> {
                 createLog(
                     "BLE_INFO",
@@ -243,19 +250,23 @@ class DeviceRegistrationFragment :
                 )
                 viewModel.connectWithDevice(args.macaddress)
             }
+
+            is BleSuccessStatus.BleDeviceRegRecordSuccess -> {
+                createLog("BLE_INFO", "Ble DEVICE_REG_CONNECTION ${data.data}")
+            }
         }
     }
 
     private fun bleLoading(data: BleLoadingStatus) {
         when (data) {
-            is BleLoadingStatus.BleConnectDevice -> {
+            is BleLoadingStatus.BleConnectDeviceLoading -> {
                 createLog(
                     "BLE_INFO",
                     "Ble Connection Loading -> ${data.msg} "
                 )
             }
 
-            is BleLoadingStatus.BleSetUpConnection -> {
+            is BleLoadingStatus.BleSetUpConnectionLoading -> {
                 createLog(
                     "BLE_INFO",
                     "Ble Connection Loading -> ${data.msg} "
@@ -267,6 +278,10 @@ class DeviceRegistrationFragment :
                     "BLE_INFO",
                     "Ble Connection Loading -> ${data.msg} "
                 )
+            }
+
+            is BleLoadingStatus.BleDeviceRegRecordLoading -> {
+                createLog("BLE_INFO", "Ble Record Loading ${data.msg}")
             }
         }
     }
@@ -292,6 +307,10 @@ class DeviceRegistrationFragment :
                     "BLE_INFO",
                     "Ble setupConnectionError -> ${data.error} and ${data.e?.localizedMessage}"
                 )
+            }
+
+            is BleErrorStatus.BleDeviceRegRecordError -> {
+                createLog("BLE_INFO","Ble Device Reg Error -> ${data.error} and ${data.e?.localizedMessage}")
             }
         }
     }
