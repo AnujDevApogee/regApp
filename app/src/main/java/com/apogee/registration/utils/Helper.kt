@@ -30,10 +30,16 @@ import java.util.TimeZone
 
 object ApiUrl {
     val loginUrl = Pair("http://120.138.10.146:8080/login_module/api/getLoginPersonData/", 1)
-    val loginProjectName = "RegistrationCumAllotment"
+    const val loginProjectName = "RegistrationCumAllotment"
 }
 
+object BleCmd{
+    const val imeiNumber="$$$$,03,03,3,1,0,0000,####"
+}
 
+enum class BleHelper {
+    IEMINUMBER
+}
 
 
 

@@ -10,10 +10,16 @@ import com.apogee.blemodule.CommunicationLibrary.SerialListener
 import com.apogee.blemodule.CommunicationLibrary.SerialService
 import com.apogee.blemodule.CommunicationLibrary.SerialSocket
 import com.apogee.registration.instance.BluetoothCommunication
+import com.apogee.registration.model.BleErrorStatus
+import com.apogee.registration.model.BleLoadingStatus
+import com.apogee.registration.model.BleSuccessStatus
+import com.apogee.registration.utils.BleHelper
+import com.apogee.registration.utils.BleHelper.*
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.createLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 
@@ -38,9 +44,14 @@ class BleDeviceCommunicationRepository(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
 
+    private var bleStatus:String?=null
+
+
+    private val timerString:Long?=null
     fun setUpConnection() {
         coroutineScope.launch {
-            _data.value = DataResponse.Loading("Please Wait Setup..")
+            _data.value =
+                DataResponse.Loading(BleLoadingStatus.BleSetUpConnection("Please Wait Setup connection.."))
             context.bindService(
                 Intent(context, SerialService::class.java),
                 this@BleDeviceCommunicationRepository,
@@ -55,7 +66,8 @@ class BleDeviceCommunicationRepository(
                 val device = bluetoothAdaptor.getRemoteDevice(macAddress)
                 val socket = SerialSocket(context, device)
                 service!!.connect(socket)
-                _data.value=DataResponse.Loading("Please Wait connection with device")
+                _data.value =
+                    DataResponse.Loading(BleLoadingStatus.BleConnectDevice("Please Wait connection with device"))
             } catch (e: Exception) {
                 onSerialConnectError(e)
             }
@@ -75,11 +87,12 @@ class BleDeviceCommunicationRepository(
     }
 
 
-    fun sendRequest(byteArray: ByteArray) {
+    fun sendRequest(byteArray: ByteArray,status: String) {
         coroutineScope.launch {
             try {
+                bleStatus=status
                 service!!.write(byteArray)
-                _data.value = DataResponse.Loading("Sending Request")
+                _data.value = DataResponse.Loading("Sending Request")// writing
             }catch (e:Exception){
                 _data.value=DataResponse.Error(null,e)
             }
@@ -92,11 +105,17 @@ class BleDeviceCommunicationRepository(
             service = (binder as SerialService.SerialBinder).service
             service!!.attach(this@BleDeviceCommunicationRepository)
             coroutineScope.launch {
-                _data.value = DataResponse.Success("Open for Connection..")
+                _data.value =
+                    DataResponse.Success(BleSuccessStatus.BleSetUpConnectionSuccess("Open for Connection.."))
             }
         } catch (e: Exception) {
-            coroutineScope.launch{
-                _data.value = DataResponse.Error("Cannot set the Connection ", e)
+            coroutineScope.launch {
+                _data.value = DataResponse.Error(
+                    BleErrorStatus.BleSetUpConnectionError(
+                        "Cannot set the Connection ",
+                        e
+                    ), null
+                )
             }
         }
     }
@@ -110,7 +129,9 @@ class BleDeviceCommunicationRepository(
     override fun onSerialConnect() {
         createLog("TAG_CONNECT", "Connected")
         coroutineScope.launch {
-            _data.value = DataResponse.Success("Device is Connected")
+            delay(2000)
+            _data.value =
+                DataResponse.Success(BleSuccessStatus.BleConnectSuccess("Device is Connected"))//pass cmd
         }
     }
 
@@ -118,7 +139,7 @@ class BleDeviceCommunicationRepository(
         coroutineScope.launch {
             createLog("BLE_SERIAL_Error","Serial Connector ${e?.localizedMessage}")
             val err = if (e == null) "Unknown Error for While Initialing Service" else null
-            _data.value = DataResponse.Error(err, e)
+            _data.value = DataResponse.Error(BleErrorStatus.BleConnectError(err, e), null)
         }
     }
 
@@ -126,8 +147,17 @@ class BleDeviceCommunicationRepository(
         createLog("TAG_NMEA", "NMEA STRING -->  $p0")
     }
 
-    override fun onSerialProtocolRead(p0: String?) {
-        createLog("TAG_PROTOCOL", "Protocol String $p0")
+    override fun onSerialProtocolRead(res: String?) {
+        if (bleStatus!=null) {
+            when (valueOf(bleStatus!!)) {
+                IEMINUMBER -> {
+
+                    //createLog("TAG_PROTOCOL", "Protocol String IEMI_NUMBER $res")
+                }
+            }
+        }else {
+            createLog("TAG_PROTOCOL", "Protocol String $res")
+        }
     }
 
     override fun onSerialResponseRead(p0: ByteArray?) {
@@ -140,7 +170,7 @@ class BleDeviceCommunicationRepository(
         coroutineScope.launch {
             createLog("BLE_SERIAL_Error"," Serial IO ${e?.localizedMessage}")
             val err = if (e == null) "Unknown Error for While Initialing Service" else null
-            _data.value = DataResponse.Error(err, e)
+            _data.value = DataResponse.Error(BleErrorStatus.BleSetUpConnectionError(err, e), null)
         }
     }
 

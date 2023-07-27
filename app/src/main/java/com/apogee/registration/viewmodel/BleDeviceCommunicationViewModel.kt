@@ -41,9 +41,9 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
         repo.disconnect()
     }
 
-    fun sendRequest(cmd: String) {
+    fun sendRequest(cmd: String,status: String) {
         val req = cmd + newline_crlf
-        repo.sendRequest(req.toByteArray())
+        repo.sendRequest(req.toByteArray(), status =status )
     }
 
 
@@ -56,7 +56,7 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
     }
 
 
-    fun disConnectService(){
+    private fun disConnectService(){
         repo.disconnectService()
     }
 

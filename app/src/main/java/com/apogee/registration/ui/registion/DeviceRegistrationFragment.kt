@@ -11,7 +11,12 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.apogee.registration.R
 import com.apogee.registration.databinding.DeviceRegistrationLayoutBinding
+import com.apogee.registration.model.BleErrorStatus
+import com.apogee.registration.model.BleLoadingStatus
+import com.apogee.registration.model.BleSuccessStatus
 import com.apogee.registration.user_case.DataConverter
+import com.apogee.registration.utils.BleCmd
+import com.apogee.registration.utils.BleHelper
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.calenderPicker
 import com.apogee.registration.utils.createLog
@@ -90,23 +95,112 @@ class DeviceRegistrationFragment :
                     if (it != null) {
                         when (it) {
                             is DataResponse.Error -> {
-                                createLog(
-                                    "BLE_INFO",
-                                    " Error ${it.data} and ${it.exception?.localizedMessage}"
-                                )
+                                if (it.data is String?) {
+                                    createLog(
+                                        "BLE_INFO",
+                                        " Error ${it.data} and ${it.exception?.localizedMessage}"
+                                    )
+                                }
+                                if (it.data is BleErrorStatus) {
+                                    bleError(it.data)
+                                }
                             }
 
                             is DataResponse.Loading -> {
-                                createLog("BLE_INFO", " Loading ${it.data}")
+                                if (it.data is String?) {
+                                    createLog("BLE_INFO", " Loading ${it.data}")
+                                }
+                                if (it.data is BleLoadingStatus) {
+                                    bleLoading(it.data)
+                                }
                             }
 
                             is DataResponse.Success -> {
-                                createLog("BLE_INFO", " Success ${it.data}")
-                                viewModel.connectWithDevice(args.macaddress)
+                                if (it.data is String?) {
+                                    createLog("BLE_INFO", " Success ${it.data}")
+                                }
+                                if (it.data is BleSuccessStatus){
+                                    bleSuccess(it.data)
+                                }
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private fun bleSuccess(data: BleSuccessStatus) {
+        when(data){
+            is BleSuccessStatus.BleConnectSuccess -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble Connection Success -> ${data.data} "
+                )
+                viewModel.sendRequest(BleCmd.imeiNumber,BleHelper.IEMINUMBER.name)
+            }
+            is BleSuccessStatus.BleImeiNumber -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble Connection Success -> ${data.data} "
+                )
+            }
+            is BleSuccessStatus.BleSetUpConnectionSuccess -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble Connection Success -> ${data.data} "
+                )
+                viewModel.connectWithDevice(args.macaddress)
+            }
+        }
+    }
+
+    private fun bleLoading(data: BleLoadingStatus) {
+        when (data) {
+            is BleLoadingStatus.BleConnectDevice -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble Connection Loading -> ${data.msg} "
+                )
+            }
+
+            is BleLoadingStatus.BleSetUpConnection -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble Connection Loading -> ${data.msg} "
+                )
+            }
+
+            is BleLoadingStatus.ImeiNumberLoading -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble Connection Loading -> ${data.msg} "
+                )
+            }
+        }
+    }
+
+    private fun bleError(data: BleErrorStatus) {
+        when (data) {
+            is BleErrorStatus.BleConnectError -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble Connection Error -> ${data.error} and ${data.e?.localizedMessage}"
+                )
+            }
+
+            is BleErrorStatus.BleImeiError -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble BleImei Error -> ${data.error} and ${data.e?.localizedMessage}"
+                )
+            }
+
+            is BleErrorStatus.BleSetUpConnectionError -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble setupConnectionError -> ${data.error} and ${data.e?.localizedMessage}"
+                )
             }
         }
     }
