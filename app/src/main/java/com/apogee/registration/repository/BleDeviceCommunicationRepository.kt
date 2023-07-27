@@ -13,15 +13,19 @@ import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.model.BleErrorStatus
 import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
-import com.apogee.registration.utils.BleHelper
-import com.apogee.registration.utils.BleHelper.*
+import com.apogee.registration.user_case.ImeiNumber
+import com.apogee.registration.user_case.TimeCompare
+import com.apogee.registration.utils.BleHelper.IEMINUMBER
+import com.apogee.registration.utils.BleHelper.valueOf
 import com.apogee.registration.utils.DataResponse
+import com.apogee.registration.utils.checkVaildString
 import com.apogee.registration.utils.createLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class BleDeviceCommunicationRepository(
     bleAdaptor: BluetoothCommunication, private val context: Context
@@ -47,7 +51,7 @@ class BleDeviceCommunicationRepository(
     private var bleStatus:String?=null
 
 
-    private val timerString:Long?=null
+    private var timerStart: Long = -1
     fun setUpConnection() {
         coroutineScope.launch {
             _data.value =
@@ -90,11 +94,25 @@ class BleDeviceCommunicationRepository(
     fun sendRequest(byteArray: ByteArray,status: String) {
         coroutineScope.launch {
             try {
-                bleStatus=status
+                bleStatus = status
+                timerStart = System.currentTimeMillis()
+                when (valueOf(bleStatus!!)) {
+                    IEMINUMBER -> {
+                        _data.value =
+                            DataResponse.Loading(BleLoadingStatus.ImeiNumberLoading("Please Wait Check For Imei Number"))
+                    }
+                }
+                delay(200)
                 service!!.write(byteArray)
-                _data.value = DataResponse.Loading("Sending Request")// writing
-            }catch (e:Exception){
-                _data.value=DataResponse.Error(null,e)
+            } catch (e: Exception) {
+                timerStart=-1
+                _data.value = if (bleStatus == null) {
+                    DataResponse.Error(null, e)
+                } else {
+                    when (valueOf(bleStatus!!)) {
+                        IEMINUMBER -> DataResponse.Error(BleErrorStatus.BleImeiError(null, e), null)
+                    }
+                }
             }
         }
     }
@@ -148,15 +166,45 @@ class BleDeviceCommunicationRepository(
     }
 
     override fun onSerialProtocolRead(res: String?) {
+        createLog("TAG_PROTOCOL", "Protocol String $res")
         if (bleStatus!=null) {
-            when (valueOf(bleStatus!!)) {
-                IEMINUMBER -> {
+            coroutineScope.launch {
+                when (valueOf(bleStatus!!)) {
+                    IEMINUMBER -> {
+                        if (timerStart != (-1).toLong()) {
+                            if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
+                                try {
+                                    if (!checkVaildString(res)) {
+                                        ImeiNumber.getImeiNumber(res!!)?.let {
+                                            _data.value = DataResponse.Success(
+                                                BleSuccessStatus.BleImeiNumber(it)
+                                            )
+                                            timerStart = -1
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    _data.value = DataResponse.Error(
+                                        BleErrorStatus.BleImeiError(
+                                            "Re-start the Process Again",
+                                            e
+                                        ), null
+                                    )
+                                }
 
-                    //createLog("TAG_PROTOCOL", "Protocol String IEMI_NUMBER $res")
+                            } else {
+                                timerStart = -1
+                                _data.value = DataResponse.Error(
+                                    BleErrorStatus.BleImeiError(
+                                        "Cannot find the Imei Number",
+                                        null
+                                    ), null
+                                )
+                            }
+                        }
+                        //createLog("TAG_PROTOCOL", "Protocol String IEMI_NUMBER $res")
+                    }
                 }
             }
-        }else {
-            createLog("TAG_PROTOCOL", "Protocol String $res")
         }
     }
 

@@ -142,7 +142,7 @@ class DeviceRegistrationFragment :
             is BleSuccessStatus.BleImeiNumber -> {
                 createLog(
                     "BLE_INFO",
-                    "Ble Connection Success -> ${data.data} "
+                    "IMEI  Ble Connection Success-> ${data.data} "
                 )
             }
             is BleSuccessStatus.BleSetUpConnectionSuccess -> {
@@ -283,5 +283,10 @@ class DeviceRegistrationFragment :
             android.R.layout.select_dialog_item,
             resources.getStringArray(strAdp)
         )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        viewModel.disconnect()
     }
 }

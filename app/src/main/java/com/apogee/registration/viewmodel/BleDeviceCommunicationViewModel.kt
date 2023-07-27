@@ -56,7 +56,7 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
     }
 
 
-    private fun disConnectService(){
+   private fun disConnectService(){
         repo.disconnectService()
     }
 
