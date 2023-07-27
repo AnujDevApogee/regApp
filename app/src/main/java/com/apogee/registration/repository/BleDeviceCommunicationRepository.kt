@@ -55,7 +55,8 @@ class BleDeviceCommunicationRepository(
                 val device = bluetoothAdaptor.getRemoteDevice(macAddress)
                 val socket = SerialSocket(context, device)
                 service!!.connect(socket)
-            } catch (e: java.lang.Exception) {
+                _data.value=DataResponse.Loading("Please Wait connection with device")
+            } catch (e: Exception) {
                 onSerialConnectError(e)
             }
         }
@@ -86,9 +87,17 @@ class BleDeviceCommunicationRepository(
     }
 
 
-    override fun onServiceConnected(p0: ComponentName?, p1: IBinder?) {
-        coroutineScope.launch {
-            _data.value = DataResponse.Success("Open of Connection..")
+    override fun onServiceConnected(p0: ComponentName?, binder: IBinder?) {
+        try {
+            service = (binder as SerialService.SerialBinder).service
+            service!!.attach(this@BleDeviceCommunicationRepository)
+            coroutineScope.launch {
+                _data.value = DataResponse.Success("Open for Connection..")
+            }
+        } catch (e: Exception) {
+            coroutineScope.launch{
+                _data.value = DataResponse.Error("Cannot set the Connection ", e)
+            }
         }
     }
 
@@ -105,10 +114,11 @@ class BleDeviceCommunicationRepository(
         }
     }
 
-    override fun onSerialConnectError(p0: Exception?) {
+    override fun onSerialConnectError(e: Exception?) {
         coroutineScope.launch {
-            val err = if (p0 == null) "Unknown Error for While Initialing Service" else null
-            _data.value = DataResponse.Error(err, p0)
+            createLog("BLE_SERIAL_Error","Serial Connector ${e?.localizedMessage}")
+            val err = if (e == null) "Unknown Error for While Initialing Service" else null
+            _data.value = DataResponse.Error(err, e)
         }
     }
 
@@ -126,10 +136,11 @@ class BleDeviceCommunicationRepository(
         }
     }
 
-    override fun onSerialIoError(p0: Exception?) {
+    override fun onSerialIoError(e: Exception?) {
         coroutineScope.launch {
-            val err = if (p0 == null) "Unknown Error for While Initialing Service" else null
-            _data.value = DataResponse.Error(err, p0)
+            createLog("BLE_SERIAL_Error"," Serial IO ${e?.localizedMessage}")
+            val err = if (e == null) "Unknown Error for While Initialing Service" else null
+            _data.value = DataResponse.Error(err, e)
         }
     }
 

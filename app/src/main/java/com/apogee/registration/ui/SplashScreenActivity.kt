@@ -50,15 +50,14 @@ class SplashScreenActivity : AppCompatActivity() {
             }
             .request { allGranted, grantedList, deniedList ->
                 if (allGranted) {
-                    goToNextActivity<DashBoardActivity>(true)
-                    /*RegistrationAppSharedPref.getInstance(this@SplashScreenActivity).also {
+                   RegistrationAppSharedPref.getInstance(this@SplashScreenActivity).also {
                         createLog("TAG_LOGIN", "${it.getLoginResponse()}")
                         if (it.getLoginResponse() == null || it.getLoginResponse()!!.data.isNullOrEmpty()) {
                             goToNextActivity<LoginActivity>(true)
                         } else {
                             goToNextActivity<DashBoardActivity>(true)
                         }
-                    }*/
+                    }
                 } else {
                     getToPermission()
                 }

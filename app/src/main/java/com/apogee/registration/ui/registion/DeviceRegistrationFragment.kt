@@ -34,10 +34,7 @@ class DeviceRegistrationFragment :
         displayActionBar(
             getString(R.string.ble_reg), binding.actionLayout, bckIc = R.drawable.ic_back_arrow
         )
-        setupUI()/*    activity?.bindService(
-                Intent(requireActivity(), SerialService::class.java), this,
-                AppCompatActivity.BIND_AUTO_CREATE
-            )*/
+        setupUI()
 
         getBleUpdates()
 
@@ -105,7 +102,7 @@ class DeviceRegistrationFragment :
 
                             is DataResponse.Success -> {
                                 createLog("BLE_INFO", " Success ${it.data}")
-                                viewModel.disConnectService()
+                                viewModel.connectWithDevice(args.macaddress)
                             }
                         }
                     }
@@ -140,14 +137,6 @@ class DeviceRegistrationFragment :
         }
     }
 
-    override fun onStart() {
-        super.onStart()/*    service?.attach(this) ?: activity?.startService(
-                Intent(
-                    requireActivity(),
-                    SerialService::class.java
-                )
-            )*/
-    }
 
     /* override fun onServiceConnected(p0: ComponentName?, binder: IBinder?) {
          showToastMsg("connection with service")
