@@ -36,6 +36,8 @@ class DeviceRegistrationFragment :
 
     private val viewModel: BleDeviceCommunicationViewModel by viewModels()
 
+    private var deviceRegModel: DeviceRegModel? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = DeviceRegistrationLayoutBinding.bind(view)
@@ -47,7 +49,6 @@ class DeviceRegistrationFragment :
         getBleUpdates()
         getDeviceRegResponse()
         getSubSubscriptionDateResponse()
-        // viewModel.setUpConnection()
 
 
         binding.submitBtn.setOnClickListener {
@@ -90,15 +91,15 @@ class DeviceRegistrationFragment :
                 return@setOnClickListener
             }
 
-            val requestBody = DeviceRegModel(
-                imei = "4784208",
+            deviceRegModel = DeviceRegModel(
+                imei = null,
                 manufacturer = manufacture,
                 deviceType = deviceType,
                 modelName = modelName,
                 modelNo = modelNo,
                 subDate = DateConverter.getConvertDate(subscriptionDate).toString()
             )
-            viewModel.sendDeviceReg(requestBody)
+            viewModel.setUpConnection()
         }
 
 
@@ -229,6 +230,11 @@ class DeviceRegistrationFragment :
                     "BLE_INFO",
                     "IMEI  Ble Connection Success-> ${data.data} "
                 )
+                showToastMsg("$data")
+                deviceRegModel?.let { model ->
+                    model.imei = data.data as String
+                    viewModel.sendDeviceReg(model)
+                } ?: showToastMsg("some thing went wrong try again!!")
             }
             is BleSuccessStatus.BleSetUpConnectionSuccess -> {
                 createLog(

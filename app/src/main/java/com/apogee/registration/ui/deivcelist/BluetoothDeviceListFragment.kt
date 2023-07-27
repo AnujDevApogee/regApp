@@ -88,7 +88,6 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
         binding.recycleViewBle.apply {
             bleAdaptor = BleDeviceAdaptor(itemClicked = {
                 createLog("BLE_CLICK", "$it")
-                showToastMsg("show item $it")
                 val dir=BluetoothDeviceListFragmentDirections.actionDeviceListFragmentToDeviceRegistrationFragment(it.device.name,it.device.address)
                 findNavController().safeNavigate(dir)
             })
