@@ -13,7 +13,7 @@ import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.model.BleErrorStatus
 import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
-import com.apogee.registration.user_case.ImeiNumber
+import com.apogee.registration.user_case.BlueProtocolFilter
 import com.apogee.registration.user_case.TimeCompare
 import com.apogee.registration.utils.BleHelper.DEVICEREGRECORD
 import com.apogee.registration.utils.BleHelper.IEMINUMBER
@@ -101,7 +101,7 @@ class BleDeviceCommunicationRepository(
                             DataResponse.Loading(BleLoadingStatus.ImeiNumberLoading("Please Wait Check For Imei Number"))
                     }
                     DEVICEREGRECORD -> {
-                         DataResponse.Loading(BleLoadingStatus.BleDeviceRegRecordLoading("Please Wait For ${String(byteArray)}"))
+                        DataResponse.Loading(BleLoadingStatus.BleDeviceRegRecordLoading("Please Wait For Device Reg"))
                     }
                 }
                 delay(200)
@@ -183,7 +183,7 @@ class BleDeviceCommunicationRepository(
                             if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
                                 try {
                                     if (!checkVaildString(res)) {
-                                        ImeiNumber.getImeiNumber(res!!)?.let {
+                                        BlueProtocolFilter.getImeiNumber(res!!)?.let {
                                             _data.value = DataResponse.Success(
                                                 BleSuccessStatus.BleImeiNumberSuccess(it)
                                             )
@@ -213,7 +213,34 @@ class BleDeviceCommunicationRepository(
                     }
 
                     DEVICEREGRECORD -> {
-                        createLog("TAG_PROTOCOL","DEVICE_REG_REG $res")
+                        if (timerStart != (-1).toLong()) {
+                            if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
+                                try {
+                                    if (!checkVaildString(res)) {
+                                        BlueProtocolFilter.getDeviceGeogProtocol(res!!)?.let {
+                                            _data.value = DataResponse.Success(
+                                                BleSuccessStatus.BleDeviceRegRecordSuccess(it)
+                                            )
+                                            timerStart = -1
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    _data.value = DataResponse.Error(
+                                        BleErrorStatus.BleDeviceRegRecordError(
+                                            "Re-start the Process Again", e
+                                        ), null
+                                    )
+                                }
+
+                            } else {
+                                timerStart = -1
+                                _data.value = DataResponse.Error(
+                                    BleErrorStatus.BleDeviceRegRecordError(
+                                        "Cannot find the Device  Subscription Reg Protocol", null
+                                    ), null
+                                )
+                            }
+                        }
                     }
                 }
             }
