@@ -2,10 +2,10 @@ package com.apogee.registration.repository
 
 import com.apogee.apilibrary.Interfaces.CustomCallback
 import com.apogee.registration.instance.ApiInstance
-import com.apogee.registration.model.LoginResponse
+import com.apogee.registration.model.DeviceRegModel
 import com.apogee.registration.utils.ApiUrl
 import com.apogee.registration.utils.DataResponse
-import com.apogee.registration.utils.deserializeFromJson
+import com.apogee.registration.utils.checkVaildString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -13,7 +13,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 
-class SendImeiNumberRepository : CustomCallback {
+class DeviceRegRepository : CustomCallback {
 
 
     private val _data =
@@ -31,14 +31,17 @@ class SendImeiNumberRepository : CustomCallback {
     }
 
 
-    fun sendImeiNumber(req: String) {
+    private var req: DeviceRegModel? = null
+
+    fun sendRequest(req: DeviceRegModel) {
         coroutine.launch {
-            _data.value = DataResponse.Loading("Please Wail Sending Imei")
+            _data.value = DataResponse.Loading("Please Wait Registration Device")
+            this@DeviceRegRepository.req = req
             api.postDataWithContentType(
-                req,
-                this@SendImeiNumberRepository,
-                ApiUrl.loginUrl.first,
-                ApiUrl.loginUrl.second,
+                this@DeviceRegRepository.req!!.deviceRegRequestBody,
+                this@DeviceRegRepository,
+                ApiUrl.deviceRegUrl.first,
+                ApiUrl.deviceRegUrl.second,
                 "application/json"
             )
         }
@@ -51,17 +54,20 @@ class SendImeiNumberRepository : CustomCallback {
                 if (it.isSuccessful) {
                     val requestBody = response.body() as ResponseBody?
                     if (requestBody != null) {
-
                         try {
-                            val responseImei =
-                                deserializeFromJson<LoginResponse>(requestBody.string())
-                            if (responseImei == null || responseImei.data.isNullOrEmpty()) {
+                            val responseImei = requestBody.string()
+                            if (checkVaildString(responseImei)) {
                                 _data.value =
                                     DataResponse.Error("Cannot Connection", null)
                             } else {
-                                _data.value = DataResponse.Success(
-                                    responseImei
-                                )
+                                _data.value =
+                                    if (responseImei.startsWith("$$$$") && responseImei.endsWith("####") && req != null) {
+                                        DataResponse.Success(Pair(req!!, responseImei))
+                                    } else if (req == null) {
+                                        DataResponse.Error("Oops Something Went Wrong", null)
+                                    } else {
+                                        DataResponse.Error(responseImei, null)
+                                    }
                             }
                         } catch (e: Exception) {
                             _data.value = DataResponse.Error(null, e)
@@ -69,7 +75,10 @@ class SendImeiNumberRepository : CustomCallback {
 
                     } else {
                         _data.value =
-                            DataResponse.Error("Cannot Process the Response", null)
+                            DataResponse.Error(
+                                "Cannot Process the Device Registration Response",
+                                null
+                            )
                     }
 
                 } else {

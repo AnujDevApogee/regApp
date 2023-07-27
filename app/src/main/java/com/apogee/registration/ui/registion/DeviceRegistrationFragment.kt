@@ -14,13 +14,16 @@ import com.apogee.registration.databinding.DeviceRegistrationLayoutBinding
 import com.apogee.registration.model.BleErrorStatus
 import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
-import com.apogee.registration.user_case.DataConverter
+import com.apogee.registration.model.DeviceRegModel
+import com.apogee.registration.user_case.DateConverter
 import com.apogee.registration.utils.BleCmd
 import com.apogee.registration.utils.BleHelper
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.calenderPicker
+import com.apogee.registration.utils.checkVaildString
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
+import com.apogee.registration.utils.showToastMsg
 import com.apogee.registration.viewmodel.BleDeviceCommunicationViewModel
 import kotlinx.coroutines.launch
 
@@ -42,50 +45,132 @@ class DeviceRegistrationFragment :
         setupUI()
 
         getBleUpdates()
-
-        viewModel.setUpConnection()
-
+        getDeviceRegResponse()
+        getSubSubscriptionDateResponse()
+        // viewModel.setUpConnection()
 
 
         binding.submitBtn.setOnClickListener {
-            /*            when (valueOf(status)) {
-                Connect -> {
-                    try {
-                        val bluetoothAdapter =
-                            BluetoothCommunication(requireContext()).getBluetoothAdaptor()
-                        val device = bluetoothAdapter.getRemoteDevice(args.macaddress)
-                        // connected = Connected.Pending
-                        val socket = SerialSocket(activity?.applicationContext, device)
-                        service!!.connect(socket)
-                    } catch (e: java.lang.Exception) {
-                        onSerialConnectError(e)
-                    }
-                }
+            val bleModel = binding.bleNme.text.toString()
+            val manufacture = binding.manufacturerLs.text.toString()
+            val deviceType = binding.deviceLs.text.toString()
+            val modelName = binding.modelNameLs.text.toString()
+            val modelNo = binding.modelNo.text.toString()
+            val subscriptionDate = binding.subscriptionDate.text.toString()
+            if (checkVaildString(bleModel)) {
+                showToastMsg("Cannot find the BleModel")
+                return@setOnClickListener
+            }
+            if (checkVaildString(manufacture)) {
+                showToastMsg("Cannot find the Manufacture")
+                return@setOnClickListener
+            }
+            if (checkVaildString(bleModel)) {
+                showToastMsg("Cannot find the BleModel")
+                return@setOnClickListener
+            }
 
-                Disconnect -> {
-                    service?.disconnect()
-                }
+            if (checkVaildString(deviceType)) {
+                showToastMsg("Cannot find the DeviceType")
+                return@setOnClickListener
+            }
 
-                Write -> {
-                  //"log gpgst ontime 1"
-                  var imeiQuery = "$$$$,03,03,3,1,0,0000,####"
-                      //"\$\$\$\$,08,D_342,02,1,NAVIK200-1.1_2330563,0000,####"
-                    //"\$\$\$\$,05,01,tqTcT7hCtcHNG8Fg35zfDgjEDyLbN8gxCfYZVSttw/k=,0000,####"
-                      //"\$\$\$\$,04,0,9,D_342,P_45643,120.138.10.146,8060,45.114.142.35,8060,12,60,4784208,0000,####"//
-                    imeiQuery += newline_crlf
-                    service?.write(imeiQuery.toByteArray())
-                }
-            }*//*   try {
-                   val bleAdaptor=BluetoothAdapter.getDefaultAdapter()//BluetoothCommunication(requireContext()).getBluetoothAdaptor()
-                   val device=bleAdaptor.getRemoteDevice(args.macaddress)
-                   val service=SerialSocket(requireContext(),device)
-                   this.service?.connect(service)
-               }catch (e:Exception){
-                   this.service?.onSerialConnectError(e)
-               }*/
+            if (checkVaildString(modelName)) {
+                showToastMsg("Cannot find the ModelNo")
+                return@setOnClickListener
+            }
+
+            if (checkVaildString(modelNo)) {
+                showToastMsg("Cannot find the ModelNo")
+                return@setOnClickListener
+            }
+
+            if (checkVaildString(subscriptionDate) || DateConverter.getConvertDate(subscriptionDate) == -1) {
+                showToastMsg("Cannot find the Subscription Date")
+                return@setOnClickListener
+            }
+
+            val requestBody = DeviceRegModel(
+                imei = "4784208",
+                manufacturer = manufacture,
+                deviceType = deviceType,
+                modelName = modelName,
+                modelNo = modelNo,
+                subDate = DateConverter.getConvertDate(subscriptionDate).toString()
+            )
+            viewModel.sendDeviceReg(requestBody)
         }
 
 
+    }
+
+    private fun getSubSubscriptionDateResponse() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.deviceSubRecordDateResponse.collect {
+                    if (it!=null){
+                        when(it){
+                            is DataResponse.Error -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "DEVICE SUB_DATE API Error is ${it.data} and ${it.exception?.localizedMessage}"
+                                )
+                            }
+                            is DataResponse.Loading -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "DEVICE SUB_DATE API LOADING is ${it.data}"
+                                )
+                            }
+                            is DataResponse.Success -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "DEVICE SUB_DATE API Success is ${it.data}"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+
+    private fun getDeviceRegResponse() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.deviceRegResponse.collect {
+                    if (it != null) {
+                        when (it) {
+                            is DataResponse.Error -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "DEVICE REG API Error is ${it.data} and ${it.exception?.localizedMessage}"
+                                )
+                            }
+
+                            is DataResponse.Loading -> {
+                                createLog("BLE_INFO", "DEVICE REG API LOADING ${it.data}")
+                            }
+
+                            is DataResponse.Success -> {
+                                createLog("BLE_INFO", "DEVICE REG API SUCCESS ${it.data}")
+                                if (it.data is Pair<*, *>) {
+                                    val obj = it.data.first as DeviceRegModel
+                                    val res = it.data.second as String
+                                    viewModel.sendDeviceSubscriptionDate(
+                                        Pair(
+                                            obj.subscriptionDateRequestBody,
+                                            res
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun getBleUpdates() {
@@ -226,7 +311,7 @@ class DeviceRegistrationFragment :
         binding.subscriptionDate.setOnClickListener {
             calenderPicker(parentFragmentManager, {}, {
                 binding.subscriptionDate.setText(it)
-                createLog("TAG_INFO", "${DataConverter.getConvertDate(it)}")
+                createLog("TAG_INFO", "${DateConverter.getConvertDate(it)}")
             })
         }
     }

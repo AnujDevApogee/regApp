@@ -29,7 +29,11 @@ import java.util.TimeZone
 
 
 object ApiUrl {
-    val loginUrl = Pair("http://120.138.10.146:8080/login_module/api/getLoginPersonData/", 1)
+    private const val BASE_URL="http://120.138.10.146:8080"
+    val loginUrl = Pair("$BASE_URL/login_module/api/getLoginPersonData/", 1)
+    val deviceRegUrl = Pair("$BASE_URL/RegistrationCumAllotment/deviceRegRecords/", 2)
+    val deviceSubscriptionUrl = Pair("$BASE_URL/RegistrationCumAllotment/deviceSubscriptionDate/", 3)
+    val deviceRegRecordsConformationUrl = Pair("$BASE_URL/RegistrationCumAllotment/deviceRegRecordsConformation", 4)
     const val loginProjectName = "RegistrationCumAllotment"
 }
 

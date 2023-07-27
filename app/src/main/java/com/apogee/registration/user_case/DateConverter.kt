@@ -3,7 +3,7 @@ package com.apogee.registration.user_case
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class DataConverter {
+class DateConverter {
 
     companion object{
         fun getConvertDate(date: String): Int {
