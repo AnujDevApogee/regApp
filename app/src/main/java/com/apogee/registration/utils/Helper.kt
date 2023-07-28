@@ -33,7 +33,10 @@ object ApiUrl {
     val loginUrl = Pair("$BASE_URL/login_module/api/getLoginPersonData/", 1)
     val deviceRegUrl = Pair("$BASE_URL/RegistrationCumAllotment/deviceRegRecords/", 2)
     val deviceSubscriptionUrl = Pair("$BASE_URL/RegistrationCumAllotment/deviceSubscriptionDate/", 3)
-    val deviceRegRecordsConformationUrl = Pair("$BASE_URL/RegistrationCumAllotment/deviceRegRecordsConformation", 4)
+    val deviceRegRecordsConformationUrl = Pair("$BASE_URL/RegistrationCumAllotment/deviceRegRecordsConformation/", 4)
+    val bleSubscriptionStatus = Pair("$BASE_URL/RegistrationCumAllotment/bleSubscriptionStatus/", 5)
+    val bleStatusCheck = Pair("$BASE_URL/RegistrationCumAllotment/bleStatusCheck/", 6)
+    val saveDevInfoReg = Pair("$BASE_URL/RegistrationCumAllotment/savePersonDeviceRegistration/", 7)
     const val loginProjectName = "RegistrationCumAllotment"
 }
 

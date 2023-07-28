@@ -6,7 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.model.DeviceRegModel
 import com.apogee.registration.repository.BleDeviceCommunicationRepository
+import com.apogee.registration.repository.BleSubscriptionStatusRepository
 import com.apogee.registration.repository.DeviceRegRepository
+import com.apogee.registration.repository.DeviceRegistrationConfirmRepository
 import com.apogee.registration.repository.SubSubscriptionDateRepository
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.newline_crlf
@@ -29,6 +31,17 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
     val deviceSubRecordDateResponse: StateFlow<DataResponse<out Any?>?>
         get() = _deviceSubRecordDateResponse
 
+
+    private val _deviceSubDateConfirmResponse = MutableStateFlow<DataResponse<out Any?>?>(null)
+    val deviceSubDateConfirmResponse: StateFlow<DataResponse<out Any?>?>
+        get() = _deviceSubDateConfirmResponse
+
+
+    private val _deviceSubDateStatusResponse = MutableStateFlow<DataResponse<out Any?>?>(null)
+    val deviceSubDateStatusResponse: StateFlow<DataResponse<out Any?>?>
+        get() = _deviceSubDateStatusResponse
+
+
     private val deviceConnectionRepo = BleDeviceCommunicationRepository(
         BluetoothCommunication.getInstance(application), application
     )
@@ -37,11 +50,21 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
 
     private val deviceSubscriptionDateRepository = SubSubscriptionDateRepository()
 
+
+    private val deviceSubscriptionDateConfirmRepository = DeviceRegistrationConfirmRepository()
+
+
+    private val deviceSubscriptionDateStatusRepository = BleSubscriptionStatusRepository()
+
+
     init {
         bleCommunication()
         getRegModel()
         getDeviceSubDateModel()
+        getBleSubDateConfirm()
+        getBleSubscriptionStatus()
     }
+
 
     fun setUpConnection() {
         deviceConnectionRepo.setUpConnection()
@@ -61,6 +84,38 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
         }
     }
 
+    //DeviceRegRecordsConformation API
+    fun sendDeviceSubscriptionConfirmDate(req: String) {
+        viewModelScope.launch {
+            deviceSubscriptionDateConfirmRepository.sendDeviceRegConfirmResult(req)
+        }
+    }
+
+    //BleSubscriptionStatus API
+    fun sendDeviceSubscriptionStatus(request: String) {
+        viewModelScope.launch {
+            deviceSubscriptionDateStatusRepository.sendDeviceRegConfirmResult(request)
+        }
+    }
+
+    private fun getBleSubscriptionStatus() {
+        viewModelScope.launch {
+            deviceSubscriptionDateStatusRepository.data.collect {
+                _deviceSubDateStatusResponse.value = it
+            }
+        }
+    }
+
+
+    private fun getBleSubDateConfirm() {
+        viewModelScope.launch {
+            deviceSubscriptionDateConfirmRepository.data.collect {
+                _deviceSubDateConfirmResponse.value = it
+            }
+        }
+    }
+
+
     private fun getRegModel() {
         viewModelScope.launch {
             deviceRegRepo.data.collect {
@@ -68,6 +123,7 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
             }
         }
     }
+
     private fun getDeviceSubDateModel() {
         viewModelScope.launch {
             deviceSubscriptionDateRepository.data.collect {

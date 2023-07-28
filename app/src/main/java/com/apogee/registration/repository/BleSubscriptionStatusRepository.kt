@@ -12,8 +12,7 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 
-class DeviceRegistrationConfirmRepository : CustomCallback {
-
+class BleSubscriptionStatusRepository : CustomCallback {
 
     private val _data =
         MutableStateFlow<DataResponse<out Any?>?>(null)
@@ -30,16 +29,16 @@ class DeviceRegistrationConfirmRepository : CustomCallback {
     }
 
 
-    private val searchString="Registration Completed@"
+    private val searchString="Subscription Successfull@"
 
     fun sendDeviceRegConfirmResult(req: String) {
         coroutine.launch {
-            _data.value = DataResponse.Loading("Please Wait Adding Confirm Device Reg Confirm...")
+            _data.value = DataResponse.Loading("Please Wait Validating Subscription Status ...")
             api.postDataWithContentType(
                 req,
-                this@DeviceRegistrationConfirmRepository,
-                ApiUrl.deviceRegRecordsConformationUrl.first,
-                ApiUrl.deviceRegRecordsConformationUrl.second,
+                this@BleSubscriptionStatusRepository,
+                ApiUrl.bleSubscriptionStatus.first,
+                ApiUrl.bleSubscriptionStatus.second,
                 "application/json"
             )
         }
@@ -54,17 +53,17 @@ class DeviceRegistrationConfirmRepository : CustomCallback {
                     if (requestBody != null) {
 
                         try {
-                            val deviceRegResponse = requestBody.string()
-                            if (checkVaildString(deviceRegResponse)) {
+                            val deviceSubStatusResponse = requestBody.string()
+                            if (checkVaildString(deviceSubStatusResponse)) {
                                 _data.value =
                                     DataResponse.Error("Cannot Connection", null)
                             } else {
                                 _data.value =
-                                    if (deviceRegResponse.contains(searchString, true)
+                                    if (deviceSubStatusResponse.contains(searchString, true)
                                     ) {
-                                        DataResponse.Success(deviceRegResponse.substringAfter(searchString))
+                                        DataResponse.Success(deviceSubStatusResponse.substringAfter(searchString))
                                     } else {
-                                        DataResponse.Error(deviceRegResponse, null)
+                                        DataResponse.Error(deviceSubStatusResponse, null)
                                     }
                             }
                         } catch (e: Exception) {

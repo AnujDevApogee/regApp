@@ -27,8 +27,7 @@ import com.apogee.registration.utils.showToastMsg
 import com.apogee.registration.viewmodel.BleDeviceCommunicationViewModel
 import kotlinx.coroutines.launch
 
-class DeviceRegistrationFragment :
-    Fragment(R.layout.device_registration_layout) {//,ServiceConnection,SerialListener {
+class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout) {
 
     private lateinit var binding: DeviceRegistrationLayoutBinding
 
@@ -48,7 +47,11 @@ class DeviceRegistrationFragment :
 
         getBleUpdates()
         getDeviceRegResponse()
-        getSubSubscriptionDateResponse()
+        getSubscriptionDateResponse()
+        getSubscriptionDateConfirmResponse()
+        getSubscriptionDataStatusResponse()
+
+
 
 
         binding.submitBtn.setOnClickListener {
@@ -58,14 +61,17 @@ class DeviceRegistrationFragment :
             val modelName = binding.modelNameLs.text.toString()
             val modelNo = binding.modelNo.text.toString()
             val subscriptionDate = binding.subscriptionDate.text.toString()
+
             if (checkVaildString(bleModel)) {
                 showToastMsg("Cannot find the BleModel")
                 return@setOnClickListener
             }
+
             if (checkVaildString(manufacture)) {
                 showToastMsg("Cannot find the Manufacture")
                 return@setOnClickListener
             }
+
             if (checkVaildString(bleModel)) {
                 showToastMsg("Cannot find the BleModel")
                 return@setOnClickListener
@@ -100,23 +106,90 @@ class DeviceRegistrationFragment :
                 subDate = DateConverter.getConvertDate(subscriptionDate).toString()
             )
             viewModel.setUpConnection()
+            //viewModel.sendDeviceSubscriptionConfirmDate("\$\$\$\$,04,D_342,06,D_342,P_56726,120.138.10.146,8060,45.114.142.35,8060,12,60,474208,0000,####")
+            //viewModel.sendDeviceSubscriptionStatus("\$\$\$\$,01,D_342,01,1,0000,####")
         }
 
 
     }
 
-    private fun getSubSubscriptionDateResponse() {
+    private fun getSubscriptionDataStatusResponse() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.deviceSubDateStatusResponse.collect {
+                    if (it != null) {
+                        when(it){
+                            is DataResponse.Error -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "Subscription_Date_STATUS Response Error is ${it.data} and ${it.exception?.localizedMessage}"
+                                )
+                            }
+                            is DataResponse.Loading -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "Subscription_Date_STATUS Response Error is ${it.data}"
+                                )
+                            }
+                            is DataResponse.Success -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "Subscription_Date_STATUS Response Error is ${it.data}"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getSubscriptionDateConfirmResponse() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.deviceSubDateConfirmResponse.collect {
+                    if (it != null) {
+                        when (it) {
+                            is DataResponse.Error -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "Subscription_Date_CONFIRM Response Error is ${it.data} and ${it.exception?.localizedMessage}"
+                                )
+                            }
+
+                            is DataResponse.Loading -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "Subscription_Date_CONFIRM Response Loading is ${it.data}"
+                                )
+                            }
+
+                            is DataResponse.Success -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "Subscription_Date_CONFIRM Response Success is ${it.data}"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getSubscriptionDateResponse() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.deviceSubRecordDateResponse.collect {
-                    if (it!=null){
-                        when(it){
+                    if (it != null) {
+                        when (it) {
                             is DataResponse.Error -> {
                                 createLog(
                                     "BLE_INFO",
                                     "DEVICE SUB_DATE API Error is ${it.data} and ${it.exception?.localizedMessage}"
                                 )
                             }
+
                             is DataResponse.Loading -> {
                                 createLog(
                                     "BLE_INFO",
@@ -253,6 +326,8 @@ class DeviceRegistrationFragment :
 
             is BleSuccessStatus.BleDeviceRegRecordSuccess -> {
                 createLog("BLE_INFO", "Ble DEVICE_REG_CONNECTION ${data.data}")
+
+                viewModel.sendDeviceSubscriptionConfirmDate(data.data as String)
             }
         }
     }
@@ -340,52 +415,6 @@ class DeviceRegistrationFragment :
             })
         }
     }
-
-
-    /* override fun onServiceConnected(p0: ComponentName?, binder: IBinder?) {
-         showToastMsg("connection with service")
-         service = (binder as SerialService.SerialBinder).service
-         service?.attach(this)
-     }
-
-     override fun onServiceDisconnected(p0: ComponentName?) {
-         showToastMsg("Disconnected")
-     }
-
-     override fun onSerialConnect() {
-         status = Write.name
-         showToastMsg("Connected")
-     }
-
-     override fun onSerialConnectError(p0: Exception?) {
-         showToastMsg("Error While Connection")
-         createLog("TAG_ble"," connection Error ${p0?.localizedMessage}")
-     }
-
-     override fun onSerialNmeaRead(p0: String?) {
-         createLog("TAG_NMEA","$p0")
-     }
-
-     override fun onSerialProtocolRead(p0: String?) {
-         createLog("TAG_PROCTOCAL","$p0")
-     }
-
-     override fun onSerialResponseRead(p0: ByteArray?) {
-         p0?.let {
-             createLog("TAG_SERIAL", String(p0))
-         }
-     }*/
-
-    /* override fun onSerialRead(p0: ByteArray?) {
-       p0?.let {
-           val string= String(p0)
-           createLog("TAG_ble","Response -> $string")
-       }
-     }*/
-
-    /*    override fun onSerialIoError(p0: Exception?) {
-            createLog("TAG_ble","Error -> ${p0?.localizedMessage}")
-        }*/
 
     private fun setAdaptor(strAdp: Int): ArrayAdapter<String> {
         return ArrayAdapter<String>(
