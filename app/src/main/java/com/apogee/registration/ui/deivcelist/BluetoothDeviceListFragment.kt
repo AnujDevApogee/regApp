@@ -12,7 +12,6 @@ import com.apogee.registration.R
 import com.apogee.registration.adaptor.BleDeviceAdaptor
 import com.apogee.registration.databinding.BluethoothDeviceListLayoutBinding
 import com.apogee.registration.datastore.RegistrationAppSharedPref
-import com.apogee.registration.dialog.ProgressDialog
 import com.apogee.registration.model.BleDeviceConnection
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.OnItemClickListener
@@ -40,10 +39,6 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
 
     private lateinit var bleAdaptor: BleDeviceAdaptor
 
-
-    private val pbDialog by lazy {
-        ProgressDialog(requireActivity())
-    }
 
     private val mnuCallBack = object :
         OnItemClickListener {
@@ -86,8 +81,6 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
             }
         }
 
-
-        pbDialog.showLoadingDialog()
 
     }
 
