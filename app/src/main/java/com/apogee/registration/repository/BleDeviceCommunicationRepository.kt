@@ -15,6 +15,7 @@ import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
 import com.apogee.registration.user_case.BlueProtocolFilter
 import com.apogee.registration.user_case.TimeCompare
+import com.apogee.registration.utils.BleHelper.BLERENAMESTATUS
 import com.apogee.registration.utils.BleHelper.DEVICEREGCONFIRM
 import com.apogee.registration.utils.BleHelper.DEVICEREGRECORD
 import com.apogee.registration.utils.BleHelper.IEMINUMBER
@@ -51,6 +52,7 @@ class BleDeviceCommunicationRepository(
 
     private var bleStatus:String?=null
 
+    private var blueRenamingCMD:String?=null
 
     private var timerStart: Long = -1
     fun setUpConnection() {
@@ -109,6 +111,11 @@ class BleDeviceCommunicationRepository(
                     DEVICEREGCONFIRM -> {
                         DataResponse.Loading(BleLoadingStatus.BleDeviceConfirmationLoading("Please Wait For Device Reg Confirmation"))
                     }
+
+                    BLERENAMESTATUS -> {
+                        blueRenamingCMD= String(byteArray)
+                        DataResponse.Loading(BleLoadingStatus.BleRenamingStatusLoading("Please Wait For Renaming Ble Device"))
+                    }
                 }
                 delay(200)
                 service!!.write(byteArray)
@@ -129,6 +136,13 @@ class BleDeviceCommunicationRepository(
                         DEVICEREGCONFIRM -> {
                             DataResponse.Error(
                                 BleErrorStatus.BleDeviceConfirmationError(null, e),
+                                null
+                            )
+                        }
+
+                        BLERENAMESTATUS -> {
+                            DataResponse.Error(
+                                BleErrorStatus.BleRenamingStatusError(null, e),
                                 null
                             )
                         }
@@ -295,6 +309,10 @@ class BleDeviceCommunicationRepository(
                                 )
                             }
                         }
+                    }
+
+                    BLERENAMESTATUS -> {
+                            createLog("TAG_PROTOCOL","Successes and rename cmd is $blueRenamingCMD")
                     }
                 }
             }

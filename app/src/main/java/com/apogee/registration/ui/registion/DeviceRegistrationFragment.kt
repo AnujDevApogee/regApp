@@ -335,6 +335,10 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                 createLog("BLE_INFO", "Ble DEVICE_REG_CONFIRM Success ${data.data}")
                 viewModel.sendDeviceSubscriptionStatus(data.data as String)
             }
+
+            is BleSuccessStatus.BleRenamingStatusSuccess -> {
+                createLog("BLE_INFO", "Ble BLE_RENAME Success ${data.data}")
+            }
         }
     }
 
@@ -367,6 +371,10 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
 
             is BleLoadingStatus.BleDeviceConfirmationLoading -> {
                 createLog("BLE_INFO", "Ble DEVICE_REG_CONNECTION Loading ${data.msg}")
+            }
+
+            is BleLoadingStatus.BleRenamingStatusLoading -> {
+                createLog("BLE_INFO", "Ble BLE_RENAME Loading ${data.msg}")
             }
         }
     }
@@ -405,6 +413,13 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                 createLog(
                     "BLE_INFO",
                     "Ble DEVICE REG Error -> ${data.error} and ${data.e?.localizedMessage}"
+                )
+            }
+
+            is BleErrorStatus.BleRenamingStatusError -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble BLE_RENAME Error -> ${data.error} and ${data.e?.localizedMessage}"
                 )
             }
         }

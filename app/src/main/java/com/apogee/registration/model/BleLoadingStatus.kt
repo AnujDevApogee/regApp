@@ -6,5 +6,6 @@ sealed class BleLoadingStatus(val msg: String){
     class BleConnectDeviceLoading(msg: String) : BleLoadingStatus(msg)
     class BleDeviceRegRecordLoading(msg: String) : BleLoadingStatus(msg)
     class BleDeviceConfirmationLoading(msg: String) : BleLoadingStatus(msg)
+    class BleRenamingStatusLoading(msg: String) : BleLoadingStatus(msg)
     class ImeiNumberLoading(msg: String) : BleLoadingStatus(msg)
 }

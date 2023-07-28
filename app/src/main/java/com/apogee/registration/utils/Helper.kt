@@ -47,7 +47,8 @@ object BleCmd{
 enum class BleHelper {
     IEMINUMBER,
     DEVICEREGRECORD,
-    DEVICEREGCONFIRM
+    DEVICEREGCONFIRM,
+    BLERENAMESTATUS
 }
 
 
