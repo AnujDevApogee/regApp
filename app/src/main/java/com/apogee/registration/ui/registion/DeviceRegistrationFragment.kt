@@ -169,6 +169,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                                     "BLE_INFO",
                                     "Subscription_Date_CONFIRM Response Success is ${it.data}"
                                 )
+                                viewModel.sendRequest(it.data as String,BleHelper.DEVICEREGCONFIRM.name)
                             }
                         }
                     }
@@ -325,9 +326,13 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             }
 
             is BleSuccessStatus.BleDeviceRegRecordSuccess -> {
-                createLog("BLE_INFO", "Ble DEVICE_REG_CONNECTION ${data.data}")
+                createLog("BLE_INFO", "Ble DEVICE_REG_CONNECTION Success ${data.data}")
 
                 viewModel.sendDeviceSubscriptionConfirmDate(data.data as String)
+            }
+
+            is BleSuccessStatus.BleDeviceConfirmationSuccess -> {
+                createLog("BLE_INFO", "Ble DEVICE_REG_CONFIRM Success ${data.data}")
             }
         }
     }
@@ -358,6 +363,10 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             is BleLoadingStatus.BleDeviceRegRecordLoading -> {
                 createLog("BLE_INFO", "Ble Record Loading ${data.msg}")
             }
+
+            is BleLoadingStatus.BleDeviceConfirmationLoading -> {
+                createLog("BLE_INFO", "Ble DEVICE_REG_CONNECTION Loading ${data.msg}")
+            }
         }
     }
 
@@ -385,7 +394,17 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             }
 
             is BleErrorStatus.BleDeviceRegRecordError -> {
-                createLog("BLE_INFO","Ble Device Reg Error -> ${data.error} and ${data.e?.localizedMessage}")
+                createLog(
+                    "BLE_INFO",
+                    "Ble Device Reg Error -> ${data.error} and ${data.e?.localizedMessage}"
+                )
+            }
+
+            is BleErrorStatus.BleDeviceConfirmationError -> {
+                createLog(
+                    "BLE_INFO",
+                    "Ble DEVICE REG Error -> ${data.error} and ${data.e?.localizedMessage}"
+                )
             }
         }
     }

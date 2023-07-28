@@ -5,4 +5,5 @@ sealed class BleSuccessStatus(var data:Any) {
     class BleSetUpConnectionSuccess(data: Any) : BleSuccessStatus(data)
     class BleConnectSuccess(data: Any) : BleSuccessStatus(data)
     class BleDeviceRegRecordSuccess(data: Any) : BleSuccessStatus(data)
+    class BleDeviceConfirmationSuccess(data: Any) : BleSuccessStatus(data)
 }

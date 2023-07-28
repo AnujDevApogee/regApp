@@ -5,4 +5,5 @@ sealed class BleErrorStatus(val error: String?,val e:Throwable?) {
     class BleDeviceRegRecordError(error: String?, e: Throwable?) : BleErrorStatus(error, e)
     class BleSetUpConnectionError(error: String?, e: Throwable?) : BleErrorStatus(error, e)
     class BleConnectError(error: String?, e: Throwable?) : BleErrorStatus(error, e)
+    class BleDeviceConfirmationError(error: String?, e: Throwable?) : BleErrorStatus(error, e)
 }

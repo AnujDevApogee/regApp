@@ -15,6 +15,7 @@ import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
 import com.apogee.registration.user_case.BlueProtocolFilter
 import com.apogee.registration.user_case.TimeCompare
+import com.apogee.registration.utils.BleHelper.DEVICEREGCONFIRM
 import com.apogee.registration.utils.BleHelper.DEVICEREGRECORD
 import com.apogee.registration.utils.BleHelper.IEMINUMBER
 import com.apogee.registration.utils.BleHelper.valueOf
@@ -98,10 +99,15 @@ class BleDeviceCommunicationRepository(
                 timerStart = System.currentTimeMillis()
                 _data.value = when (valueOf(bleStatus!!)) {
                     IEMINUMBER -> {
-                            DataResponse.Loading(BleLoadingStatus.ImeiNumberLoading("Please Wait Check For Imei Number"))
+                        DataResponse.Loading(BleLoadingStatus.ImeiNumberLoading("Please Wait Check For Imei Number"))
                     }
+
                     DEVICEREGRECORD -> {
                         DataResponse.Loading(BleLoadingStatus.BleDeviceRegRecordLoading("Please Wait For Device Reg"))
+                    }
+
+                    DEVICEREGCONFIRM -> {
+                        DataResponse.Loading(BleLoadingStatus.BleDeviceConfirmationLoading("Please Wait For Device Reg Confirmation"))
                     }
                 }
                 delay(200)
@@ -116,6 +122,13 @@ class BleDeviceCommunicationRepository(
                         DEVICEREGRECORD -> {
                             DataResponse.Error(
                                 BleErrorStatus.BleDeviceRegRecordError(null, e),
+                                null
+                            )
+                        }
+
+                        DEVICEREGCONFIRM -> {
+                            DataResponse.Error(
+                                BleErrorStatus.BleDeviceConfirmationError(null, e),
                                 null
                             )
                         }
@@ -241,6 +254,10 @@ class BleDeviceCommunicationRepository(
                                 )
                             }
                         }
+                    }
+
+                    DEVICEREGCONFIRM -> {
+                        createLog("TAG_PROTOCOL","DEVICE CONFIRMATION --> $res")
                     }
                 }
             }
