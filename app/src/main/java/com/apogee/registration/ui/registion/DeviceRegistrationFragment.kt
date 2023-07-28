@@ -128,13 +128,13 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             is DataResponse.Loading -> {
                                 createLog(
                                     "BLE_INFO",
-                                    "Subscription_Date_STATUS Response Error is ${it.data}"
+                                    "Subscription_Date_STATUS Response Loading is ${it.data}"
                                 )
                             }
                             is DataResponse.Success -> {
                                 createLog(
                                     "BLE_INFO",
-                                    "Subscription_Date_STATUS Response Error is ${it.data}"
+                                    "Subscription_Date_STATUS Response Success is ${it.data}"
                                 )
                             }
                         }
@@ -333,6 +333,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
 
             is BleSuccessStatus.BleDeviceConfirmationSuccess -> {
                 createLog("BLE_INFO", "Ble DEVICE_REG_CONFIRM Success ${data.data}")
+                viewModel.sendDeviceSubscriptionStatus(data.data as String)
             }
         }
     }
