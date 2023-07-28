@@ -34,14 +34,18 @@ class DeviceRegistrationConfirmRepository : CustomCallback {
 
     fun sendDeviceRegConfirmResult(req: String) {
         coroutine.launch {
-            _data.value = DataResponse.Loading("Please Wait Adding Confirm Device Reg Confirm...")
-            api.postDataWithContentType(
-                req,
-                this@DeviceRegistrationConfirmRepository,
-                ApiUrl.deviceRegRecordsConformationUrl.first,
-                ApiUrl.deviceRegRecordsConformationUrl.second,
-                "application/json"
-            )
+            try {
+                _data.value = DataResponse.Loading("Please Wait Adding Confirm Device Reg Confirm...")
+                api.postDataWithContentType(
+                    req,
+                    this@DeviceRegistrationConfirmRepository,
+                    ApiUrl.deviceRegRecordsConformationUrl.first,
+                    ApiUrl.deviceRegRecordsConformationUrl.second,
+                    "application/json"
+                )
+            }catch (e:Exception){
+                _data.value=DataResponse.Error("Cannot send request",e)
+            }
         }
     }
 

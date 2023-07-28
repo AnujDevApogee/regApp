@@ -35,15 +35,19 @@ class DeviceRegRepository : CustomCallback {
 
     fun sendRequest(req: DeviceRegModel) {
         coroutine.launch {
-            _data.value = DataResponse.Loading("Please Wait Registration Device")
-            this@DeviceRegRepository.req = req
-            api.postDataWithContentType(
-                this@DeviceRegRepository.req!!.deviceRegRequestBody,
-                this@DeviceRegRepository,
-                ApiUrl.deviceRegUrl.first,
-                ApiUrl.deviceRegUrl.second,
-                "application/json"
-            )
+            try {
+                _data.value = DataResponse.Loading("Please Wait Registration Device")
+                this@DeviceRegRepository.req = req
+                api.postDataWithContentType(
+                    this@DeviceRegRepository.req!!.deviceRegRequestBody,
+                    this@DeviceRegRepository,
+                    ApiUrl.deviceRegUrl.first,
+                    ApiUrl.deviceRegUrl.second,
+                    "application/json"
+                )
+            }catch (e:Exception){
+                _data.value=DataResponse.Error("Cannot send request",e)
+            }
         }
     }
 

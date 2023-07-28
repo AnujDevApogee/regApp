@@ -45,12 +45,6 @@ class BleDeviceConnectionRepository(
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             coroutineScope.launch {
-                /*
-                * && result.device.name.contains(
-                        "navik",
-                        true
-                    )
-                * */
                 try {
                     if (result != null && result.device?.name != null && result.device.address != null) {
                         Log.i(

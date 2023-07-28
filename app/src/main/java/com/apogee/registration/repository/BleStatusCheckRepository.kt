@@ -12,7 +12,8 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 
-class BleSubscriptionStatusRepository : CustomCallback {
+class BleStatusCheckRepository : CustomCallback {
+
 
     private val _data =
         MutableStateFlow<DataResponse<out Any?>?>(null)
@@ -29,17 +30,22 @@ class BleSubscriptionStatusRepository : CustomCallback {
     }
 
 
-    private val searchString="Subscription Successfull@"
+    private val searchString="Registration, Ble Renaming and Subscription Successfull"
 
-    fun sendDeviceRegConfirmResult(req: String) {
+    private var deviceName:Pair<String,String>?=null
+
+    fun sendBleStatusResult(req: String) {
         coroutine.launch {
             try {
-                _data.value = DataResponse.Loading("Please Wait Validating Subscription Status ...")
+                _data.value = DataResponse.Loading("Please Wait Renaming Ble Device..")
+                deviceName=req.split(",".toRegex()).let {
+                    Pair(it[5],it[2])//Device Name, Device Reg No
+                }
                 api.postDataWithContentType(
                     req,
-                    this@BleSubscriptionStatusRepository,
-                    ApiUrl.bleSubscriptionStatus.first,
-                    ApiUrl.bleSubscriptionStatus.second,
+                    this@BleStatusCheckRepository,
+                    ApiUrl.bleStatusCheck.first,
+                    ApiUrl.bleStatusCheck.second,
                     "application/json"
                 )
             }catch (e:Exception){
@@ -57,17 +63,18 @@ class BleSubscriptionStatusRepository : CustomCallback {
                     if (requestBody != null) {
 
                         try {
-                            val deviceSubStatusResponse = requestBody.string()
-                            if (checkVaildString(deviceSubStatusResponse)) {
+                            val deviceRegResponse = requestBody.string()
+                            if (checkVaildString(deviceRegResponse)) {
                                 _data.value =
                                     DataResponse.Error("Cannot Connection", null)
                             } else {
                                 _data.value =
-                                    if (deviceSubStatusResponse.contains(searchString, true)
-                                    ) {
-                                        DataResponse.Success(deviceSubStatusResponse.substringAfter(searchString))
-                                    } else {
-                                        DataResponse.Error(deviceSubStatusResponse, null)
+                                    if (deviceRegResponse.contains(searchString, true) && deviceName!=null) {
+                                        DataResponse.Success(deviceName!!)
+                                    }else if(deviceName==null){
+                                        DataResponse.Error("Lost some data",null)
+                                    }else {
+                                        DataResponse.Error(deviceRegResponse, null)
                                     }
                             }
                         } catch (e: Exception) {

@@ -34,15 +34,20 @@ class SubSubscriptionDateRepository : CustomCallback {
 
     fun sendSubSubscriptionRequest(req: Pair<String, String>) {
         coroutine.launch {
-            _data.value = DataResponse.Loading("Please Wait Adding Subscription Time...")
-            deviceRegistrationString = req.second
-            api.postDataWithContentType(
-                req.first,
-                this@SubSubscriptionDateRepository,
-                ApiUrl.deviceSubscriptionUrl.first,
-                ApiUrl.deviceSubscriptionUrl.second,
-                "application/json"
-            )
+            try {
+                _data.value = DataResponse.Loading("Please Wait Adding Subscription Time...")
+                deviceRegistrationString = req.second
+                api.postDataWithContentType(
+                    req.first,
+                    this@SubSubscriptionDateRepository,
+                    ApiUrl.deviceSubscriptionUrl.first,
+                    ApiUrl.deviceSubscriptionUrl.second,
+                    "application/json"
+                )
+            }catch (e:Exception){
+                _data.value=DataResponse.Error("Cannot send request",e)
+            }
+
         }
     }
 

@@ -12,7 +12,8 @@ import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 
-class BleSubscriptionStatusRepository : CustomCallback {
+class SavePersonDeviceRegistrationRepository : CustomCallback {
+
 
     private val _data =
         MutableStateFlow<DataResponse<out Any?>?>(null)
@@ -29,21 +30,24 @@ class BleSubscriptionStatusRepository : CustomCallback {
     }
 
 
-    private val searchString="Subscription Successfull@"
+    private val searchString = "Registration, Ble Renaming and Subscription Successfull"
 
-    fun sendDeviceRegConfirmResult(req: String) {
+    private var deviceName: String? = null
+
+    fun sendSavePersonResult(req: String, deviceName: String) {
         coroutine.launch {
             try {
-                _data.value = DataResponse.Loading("Please Wait Validating Subscription Status ...")
+                _data.value = DataResponse.Loading("Please Wait Validating user..")
+                this@SavePersonDeviceRegistrationRepository.deviceName=deviceName
                 api.postDataWithContentType(
                     req,
-                    this@BleSubscriptionStatusRepository,
-                    ApiUrl.bleSubscriptionStatus.first,
-                    ApiUrl.bleSubscriptionStatus.second,
+                    this@SavePersonDeviceRegistrationRepository,
+                    ApiUrl.saveDevInfoReg.first,
+                    ApiUrl.saveDevInfoReg.second,
                     "application/json"
                 )
-            }catch (e:Exception){
-                _data.value=DataResponse.Error("Cannot send request",e)
+            } catch (e: Exception) {
+                _data.value = DataResponse.Error("Cannot send request", e)
             }
         }
     }
@@ -57,17 +61,22 @@ class BleSubscriptionStatusRepository : CustomCallback {
                     if (requestBody != null) {
 
                         try {
-                            val deviceSubStatusResponse = requestBody.string()
-                            if (checkVaildString(deviceSubStatusResponse)) {
+                            val deviceRegResponse = requestBody.string()
+                            if (checkVaildString(deviceRegResponse)) {
                                 _data.value =
                                     DataResponse.Error("Cannot Connection", null)
                             } else {
                                 _data.value =
-                                    if (deviceSubStatusResponse.contains(searchString, true)
+                                    if (deviceRegResponse.contains(
+                                            searchString,
+                                            true
+                                        ) && deviceName != null
                                     ) {
-                                        DataResponse.Success(deviceSubStatusResponse.substringAfter(searchString))
+                                        DataResponse.Success("Ble Registration Successfully ${deviceName!!}")
+                                    } else if (deviceName == null) {
+                                        DataResponse.Error("Lost some data", null)
                                     } else {
-                                        DataResponse.Error(deviceSubStatusResponse, null)
+                                        DataResponse.Error(deviceRegResponse, null)
                                     }
                             }
                         } catch (e: Exception) {

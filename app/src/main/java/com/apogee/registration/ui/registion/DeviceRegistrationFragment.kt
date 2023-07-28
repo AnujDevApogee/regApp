@@ -50,6 +50,8 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         getSubscriptionDateResponse()
         getSubscriptionDateConfirmResponse()
         getSubscriptionDataStatusResponse()
+        getBleStatusCheck()
+        getSavePersonResponse()
 
 
 
@@ -108,9 +110,75 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             viewModel.setUpConnection()
             //viewModel.sendDeviceSubscriptionConfirmDate("\$\$\$\$,04,D_342,06,D_342,P_56726,120.138.10.146,8060,45.114.142.35,8060,12,60,474208,0000,####")
             //viewModel.sendDeviceSubscriptionStatus("\$\$\$\$,01,D_342,01,1,0000,####")
+            //viewModel.sendBleStatusCheckStatus("\$\$\$\$,08,D_184,02,1,NAVIK50-1.0__2338342,0000,####")
+            //viewModel.sendSavePersonResponse("13324,4545", "NAVIK50-1.0__2338342")
         }
 
 
+    }
+
+    private fun getSavePersonResponse() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.savePersonCheckResponse.collect {
+                    if (it!=null){
+                        when(it){
+                            is DataResponse.Error -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "SAVE_PERSON_RESPONSE Response Error is ${it.data} and ${it.exception?.localizedMessage}"
+                                )
+                            }
+                            is DataResponse.Loading -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "SAVE_PERSON_RESPONSE Response Loading is ${it.data}"
+                                )
+                            }
+                            is DataResponse.Success -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "SAVE_PERSON_RESPONSE Response SUCCESS is ${it.data}"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getBleStatusCheck() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.bleStatusCheckResponse.collect {
+                    if (it != null) {
+                        when (it) {
+                            is DataResponse.Error -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "BLE_DEVICE_STATUS_CHECK Response Error is ${it.data} and ${it.exception?.localizedMessage}"
+                                )
+                            }
+
+                            is DataResponse.Loading -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "BLE_DEVICE_STATUS_CHECK Response Loading is ${it.data}"
+                                )
+                            }
+
+                            is DataResponse.Success -> {
+                                createLog(
+                                    "BLE_INFO",
+                                    "BLE_DEVICE_STATUS_CHECK Response Success is ${it.data}"
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private fun getSubscriptionDataStatusResponse() {
@@ -118,13 +186,14 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.deviceSubDateStatusResponse.collect {
                     if (it != null) {
-                        when(it){
+                        when (it) {
                             is DataResponse.Error -> {
                                 createLog(
                                     "BLE_INFO",
                                     "Subscription_Date_STATUS Response Error is ${it.data} and ${it.exception?.localizedMessage}"
                                 )
                             }
+
                             is DataResponse.Loading -> {
                                 createLog(
                                     "BLE_INFO",

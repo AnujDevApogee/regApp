@@ -6,9 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.model.DeviceRegModel
 import com.apogee.registration.repository.BleDeviceCommunicationRepository
+import com.apogee.registration.repository.BleStatusCheckRepository
 import com.apogee.registration.repository.BleSubscriptionStatusRepository
 import com.apogee.registration.repository.DeviceRegRepository
 import com.apogee.registration.repository.DeviceRegistrationConfirmRepository
+import com.apogee.registration.repository.SavePersonDeviceRegistrationRepository
 import com.apogee.registration.repository.SubSubscriptionDateRepository
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.newline_crlf
@@ -42,6 +44,15 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
         get() = _deviceSubDateStatusResponse
 
 
+    private val _bleStatusCheckResponse = MutableStateFlow<DataResponse<out Any?>?>(null)
+    val bleStatusCheckResponse: StateFlow<DataResponse<out Any?>?>
+        get() = _bleStatusCheckResponse
+
+    private val _savePersonCheckResponse = MutableStateFlow<DataResponse<out Any?>?>(null)
+    val savePersonCheckResponse: StateFlow<DataResponse<out Any?>?>
+        get() = _savePersonCheckResponse
+
+
     private val deviceConnectionRepo = BleDeviceCommunicationRepository(
         BluetoothCommunication.getInstance(application), application
     )
@@ -56,6 +67,10 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
 
     private val deviceSubscriptionDateStatusRepository = BleSubscriptionStatusRepository()
 
+    private val bleStatusCheckRepository = BleStatusCheckRepository()
+
+    private val savePersonDeviceRegistrationRepository = SavePersonDeviceRegistrationRepository()
+
 
     init {
         bleCommunication()
@@ -63,6 +78,8 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
         getDeviceSubDateModel()
         getBleSubDateConfirm()
         getBleSubscriptionStatus()
+        getBleSubStatus()
+        getPersonDeviceResponse()
     }
 
 
@@ -95,6 +112,37 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
     fun sendDeviceSubscriptionStatus(request: String) {
         viewModelScope.launch {
             deviceSubscriptionDateStatusRepository.sendDeviceRegConfirmResult(request)
+        }
+    }
+
+    //BleStatusCheck API
+    fun sendBleStatusCheckStatus(request: String) {
+        viewModelScope.launch {
+            bleStatusCheckRepository.sendBleStatusResult(request)
+        }
+    }
+
+    //SavePersonCheck API
+    fun sendSavePersonResponse(request: String, deviceName: String) {
+        viewModelScope.launch {
+            savePersonDeviceRegistrationRepository.sendSavePersonResult(request, deviceName)
+        }
+    }
+
+
+    private fun getPersonDeviceResponse() {
+        viewModelScope.launch {
+            savePersonDeviceRegistrationRepository.data.collect {
+                _savePersonCheckResponse.value = it
+            }
+        }
+    }
+
+    private fun getBleSubStatus() {
+        viewModelScope.launch {
+            bleStatusCheckRepository.data.collect {
+                _bleStatusCheckResponse.value = it
+            }
         }
     }
 
