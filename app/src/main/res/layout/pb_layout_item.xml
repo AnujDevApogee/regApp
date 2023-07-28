@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground">
+
+
+    <com.google.android.material.progressindicator.CircularProgressIndicator
+        android:id="@+id/pb"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:progress="0"
+        app:indicatorColor="#4CAF50"
+        app:indicatorSize="30dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:trackColor="#D3CFCF"
+        app:trackCornerRadius="15dp" />
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ic_success"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@id/pb"
+        app:layout_constraintLeft_toLeftOf="@id/pb"
+        app:layout_constraintRight_toRightOf="@id/pb"
+        app:layout_constraintTop_toTopOf="@id/pb"
+        app:tint="#4CAF50" />
+
+
+    <TextView
+        android:id="@+id/pb_txt"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Please Wait.."
+        android:textColor="#D3CFCF"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/pb"
+        app:layout_constraintLeft_toRightOf="@id/pb"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/pb"
+        tools:text="Please Wait loading device..." />
+
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/more_info"
+        style="@style/Widget.Material3.Button.TextButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:text="More Info"
+        android:textColor="#2196F3"
+        android:textStyle="bold"
+        android:visibility="gone"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pb_txt" />
+</androidx.constraintlayout.widget.ConstraintLayout>
