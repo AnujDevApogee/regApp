@@ -11,6 +11,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.navArgs
 import com.apogee.registration.R
 import com.apogee.registration.databinding.DeviceRegistrationLayoutBinding
+import com.apogee.registration.datastore.RegistrationAppSharedPref
 import com.apogee.registration.model.BleErrorStatus
 import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
@@ -27,6 +28,7 @@ import com.apogee.registration.utils.showToastMsg
 import com.apogee.registration.viewmodel.BleDeviceCommunicationViewModel
 import kotlinx.coroutines.launch
 
+@Suppress("UNCHECKED_CAST")
 class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout) {
 
     private lateinit var binding: DeviceRegistrationLayoutBinding
@@ -36,6 +38,10 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     private val viewModel: BleDeviceCommunicationViewModel by viewModels()
 
     private var deviceRegModel: DeviceRegModel? = null
+
+    private val sharedPref by lazy {
+        RegistrationAppSharedPref.getInstance(requireActivity())
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -129,12 +135,14 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                                     "SAVE_PERSON_RESPONSE Response Error is ${it.data} and ${it.exception?.localizedMessage}"
                                 )
                             }
+
                             is DataResponse.Loading -> {
                                 createLog(
                                     "BLE_INFO",
                                     "SAVE_PERSON_RESPONSE Response Loading is ${it.data}"
                                 )
                             }
+
                             is DataResponse.Success -> {
                                 createLog(
                                     "BLE_INFO",
@@ -173,6 +181,10 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                                     "BLE_INFO",
                                     "BLE_DEVICE_STATUS_CHECK Response Success is ${it.data}"
                                 )
+                                val res = it.data as Pair<String, String>
+                                val str =
+                                    "${sharedPref.getLoginResponse()!!.data!!.first().keyPersonId},${res.second}"
+                                viewModel.sendSavePersonResponse(str, res.first)
                             }
                         }
                     }
@@ -200,10 +212,15 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                                     "Subscription_Date_STATUS Response Loading is ${it.data}"
                                 )
                             }
+
                             is DataResponse.Success -> {
                                 createLog(
                                     "BLE_INFO",
                                     "Subscription_Date_STATUS Response Success is ${it.data}"
+                                )
+                                viewModel.sendRequest(
+                                    it.data as String,
+                                    BleHelper.BLERENAMESTATUS.name
                                 )
                             }
                         }
@@ -266,6 +283,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                                     "DEVICE SUB_DATE API LOADING is ${it.data}"
                                 )
                             }
+
                             is DataResponse.Success -> {
                                 createLog(
                                     "BLE_INFO",
@@ -407,6 +425,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
 
             is BleSuccessStatus.BleRenamingStatusSuccess -> {
                 createLog("BLE_INFO", "Ble BLE_RENAME Success ${data.data}")
+                viewModel.sendBleStatusCheckStatus(data.data as String)
             }
         }
     }

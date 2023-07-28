@@ -313,6 +313,10 @@ class BleDeviceCommunicationRepository(
 
                     BLERENAMESTATUS -> {
                             createLog("TAG_PROTOCOL","Successes and rename cmd is $blueRenamingCMD")
+                        if (blueRenamingCMD!=null){
+                            timerStart=-1
+                            _data.value=DataResponse.Success(blueRenamingCMD.toString())
+                        }
                     }
                 }
             }
