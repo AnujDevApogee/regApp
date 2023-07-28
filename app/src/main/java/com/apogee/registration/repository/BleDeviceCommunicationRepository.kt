@@ -187,7 +187,10 @@ class BleDeviceCommunicationRepository(
     }
 
     override fun onSerialProtocolRead(res: String?) {
-        createLog("TAG_PROTOCOL", "Protocol String $res")
+        createLog(
+            "TAG_PROTOCOL",
+            "${if (bleStatus.isNullOrEmpty()) "" else "$bleStatus"} Protocol String $res"
+        )
         if (bleStatus!=null) {
             coroutineScope.launch {
                 when (valueOf(bleStatus!!)) {
@@ -222,7 +225,6 @@ class BleDeviceCommunicationRepository(
                                 )
                             }
                         }
-                        //createLog("TAG_PROTOCOL", "Protocol String IEMI_NUMBER $res")
                     }
 
                     DEVICEREGRECORD -> {
