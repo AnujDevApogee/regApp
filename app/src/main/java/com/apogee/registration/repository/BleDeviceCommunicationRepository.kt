@@ -257,7 +257,42 @@ class BleDeviceCommunicationRepository(
                     }
 
                     DEVICEREGCONFIRM -> {
-                        createLog("TAG_PROTOCOL","DEVICE CONFIRMATION --> $res")
+                        if (timerStart != (-1).toLong()) {
+                            if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
+                                try {
+                                    if (!checkVaildString(res)) {
+                                        BlueProtocolFilter.getDeviceBleRegConfirm(res!!)?.let {
+                                            _data.value = if (it.isNotEmpty() && it.isNotBlank()) {
+                                                DataResponse.Success(
+                                                    BleSuccessStatus.BleDeviceConfirmationSuccess(it)
+                                                )
+                                            } else {
+                                                DataResponse.Error(
+                                                    BleErrorStatus.BleDeviceConfirmationError(
+                                                        "Failed to verify subscription", null
+                                                    ), null
+                                                )
+                                            }
+                                            timerStart = -1
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    _data.value = DataResponse.Error(
+                                        BleErrorStatus.BleDeviceConfirmationError(
+                                            "Re-start the Process Again", e
+                                        ), null
+                                    )
+                                }
+
+                            } else {
+                                timerStart = -1
+                                _data.value = DataResponse.Error(
+                                    BleErrorStatus.BleDeviceConfirmationError(
+                                        "Cannot find the Device Subscription Confirmation Protocol", null
+                                    ), null
+                                )
+                            }
+                        }
                     }
                 }
             }

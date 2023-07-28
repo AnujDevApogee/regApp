@@ -33,5 +33,31 @@ class BlueProtocolFilter {
             }
         }
 
+
+        fun getDeviceBleRegConfirm(checkString: String): String? {
+            return try {
+                if (checkString.contains("$$$$,1")
+                    || checkString.contains("$$$$,01")
+                    || checkString.contains("$$$$,0001")
+                    || checkString.contains("$$$$,00001")
+                    || checkString.contains("$$$$,000001")
+                ) {
+                    val res = checkString.split(",".toRegex()).let { ls ->
+                        val status = ls[4].toInt()
+                        if (status == 1) {
+                            checkString
+                        } else {
+                            ""
+                        }
+                    }
+                    res
+                } else {
+                    null
+                }
+            } catch (e: Exception) {
+                null
+            }
+        }
+
     }
 }
