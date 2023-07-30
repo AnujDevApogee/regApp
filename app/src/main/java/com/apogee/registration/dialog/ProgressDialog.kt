@@ -17,14 +17,15 @@ class ProgressDialog(private val context: Activity) {
 
     init {
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE)
+        showLoadingDialog()
     }
 
 
     private lateinit var binding: ProgressBrLayoutBinding
 
 
-    fun showLoadingDialog(){
-        binding= ProgressBrLayoutBinding.inflate(context.layoutInflater)
+    private fun showLoadingDialog() {
+        binding = ProgressBrLayoutBinding.inflate(context.layoutInflater)
         dialog.setContentView(binding.root)
         dialog.setCancelable(false)
         val window: Window? = dialog.window
@@ -37,39 +38,66 @@ class ProgressDialog(private val context: Activity) {
 
 
         binding.apply {
-            configImeiNumberPb.pb.isIndeterminate=true
+   /*         configImeiNumberPb.pb.isIndeterminate = true
             configImeiNumberPb.pbTxt.apply {
 
-                text="Please Wait Connecting.."
+                text = "Please Wait Connecting.."
                 setTextColor(Color.BLACK)
-            }
-           /* regSubPb.apply {
-                pb.invisible()
-                img.show()
-                img.setImageResource(R.drawable.ic_success)
-                pbTxt.apply {
-                    text="Device Connect"
-                    setTextColor(Color.BLACK)
-                }
-            }
-
-            regSubDeviceConfig.apply {
-                pb.invisible()
-                img.show()
-                img.setImageResource(R.drawable.ic_error)
-                img.imageTintList= ColorStateList.valueOf(Color.RED)
-                pbTxt.apply {
-                    text="Error while connoting"
-                    setTextColor(Color.BLACK)
-                }
-                moreInfo.show()
             }*/
+            /* regSubPb.apply {
+                 pb.invisible()
+                 img.show()
+                 img.setImageResource(R.drawable.ic_success)
+                 pbTxt.apply {
+                     text="Device Connect"
+                     setTextColor(Color.BLACK)
+                 }
+             }
+
+             regSubDeviceConfig.apply {
+                 pb.invisible()
+                 img.show()
+                 img.setImageResource(R.drawable.ic_error)
+                 img.imageTintList= ColorStateList.valueOf(Color.RED)
+                 pbTxt.apply {
+                     text="Error while connoting"
+                     setTextColor(Color.BLACK)
+                 }
+                 moreInfo.show()
+             }*/
 
 
         }
-binding.retry.hide()
+        binding.retry.hide()
         dialog.show()
     }
+
+
+
+    fun showLoading(){
+
+    }
+
+    fun showErrorText(){
+
+    }
+
+    fun showSuccess(){
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
