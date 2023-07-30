@@ -13,7 +13,7 @@ import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.model.BleErrorStatus
 import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
-import com.apogee.registration.user_case.BlueProtocolFilter
+import com.apogee.registration.user_case.BleProtocolFilter
 import com.apogee.registration.user_case.TimeCompare
 import com.apogee.registration.utils.BleHelper.BLERENAMESTATUS
 import com.apogee.registration.utils.BleHelper.DEVICEREGCONFIRM
@@ -50,9 +50,9 @@ class BleDeviceCommunicationRepository(
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
 
-    private var bleStatus:String?=null
+    private var bleStatus: String? = null
 
-    private var blueRenamingCMD:String?=null
+    private var blueRenamingCMD: String? = null
 
     private var timerStart: Long = -1
     fun setUpConnection() {
@@ -94,7 +94,7 @@ class BleDeviceCommunicationRepository(
     }
 
 
-    fun sendRequest(byteArray: ByteArray,status: String) {
+    fun sendRequest(byteArray: ByteArray, status: String) {
         coroutineScope.launch {
             try {
                 bleStatus = status
@@ -113,14 +113,14 @@ class BleDeviceCommunicationRepository(
                     }
 
                     BLERENAMESTATUS -> {
-                        blueRenamingCMD= String(byteArray)
+                        blueRenamingCMD = String(byteArray)
                         DataResponse.Loading(BleLoadingStatus.BleRenamingStatusLoading("Please Wait For Renaming Ble Device"))
                     }
                 }
                 delay(200)
                 service!!.write(byteArray)
             } catch (e: Exception) {
-                timerStart=-1
+                timerStart = -1
                 _data.value = if (bleStatus == null) {
                     DataResponse.Error(null, e)
                 } else {
@@ -190,7 +190,7 @@ class BleDeviceCommunicationRepository(
 
     override fun onSerialConnectError(e: Exception?) {
         coroutineScope.launch {
-            createLog("BLE_SERIAL_Error","Serial Connector ${e?.localizedMessage}")
+            createLog("BLE_SERIAL_Error", "Serial Connector ${e?.localizedMessage}")
             val err = if (e == null) "Unknown Error for While Initialing Service" else null
             _data.value = DataResponse.Error(BleErrorStatus.BleConnectError(err, e), null)
         }
@@ -205,7 +205,7 @@ class BleDeviceCommunicationRepository(
             "TAG_PROTOCOL",
             "${if (bleStatus.isNullOrEmpty()) "" else "$bleStatus"} Protocol String $res"
         )
-        if (bleStatus!=null) {
+        if (bleStatus != null) {
             coroutineScope.launch {
                 when (valueOf(bleStatus!!)) {
                     IEMINUMBER -> {
@@ -213,7 +213,7 @@ class BleDeviceCommunicationRepository(
                             if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
                                 try {
                                     if (!checkVaildString(res)) {
-                                        BlueProtocolFilter.getImeiNumber(res!!)?.let {
+                                        BleProtocolFilter.getImeiNumber(res!!)?.let {
                                             _data.value = DataResponse.Success(
                                                 BleSuccessStatus.BleImeiNumberSuccess(it)
                                             )
@@ -246,7 +246,7 @@ class BleDeviceCommunicationRepository(
                             if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
                                 try {
                                     if (!checkVaildString(res)) {
-                                        BlueProtocolFilter.getDeviceGeogProtocol(res!!)?.let {
+                                        BleProtocolFilter.getDeviceGeogProtocol(res!!)?.let {
                                             _data.value = DataResponse.Success(
                                                 BleSuccessStatus.BleDeviceRegRecordSuccess(it)
                                             )
@@ -277,7 +277,7 @@ class BleDeviceCommunicationRepository(
                             if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
                                 try {
                                     if (!checkVaildString(res)) {
-                                        BlueProtocolFilter.getDeviceBleRegConfirm(res!!)?.let {
+                                        BleProtocolFilter.getDeviceBleRegConfirm(res!!)?.let {
                                             _data.value = if (it.isNotEmpty() && it.isNotBlank()) {
                                                 DataResponse.Success(
                                                     BleSuccessStatus.BleDeviceConfirmationSuccess(it)
@@ -304,7 +304,8 @@ class BleDeviceCommunicationRepository(
                                 timerStart = -1
                                 _data.value = DataResponse.Error(
                                     BleErrorStatus.BleDeviceConfirmationError(
-                                        "Cannot find the Device Subscription Confirmation Protocol", null
+                                        "Cannot find the Device Subscription Confirmation Protocol",
+                                        null
                                     ), null
                                 )
                             }
@@ -312,10 +313,19 @@ class BleDeviceCommunicationRepository(
                     }
 
                     BLERENAMESTATUS -> {
-                            createLog("TAG_PROTOCOL","Successes and rename cmd is $blueRenamingCMD")
-                        if (blueRenamingCMD!=null){
-                            timerStart=-1
-                            _data.value=DataResponse.Success(blueRenamingCMD.toString())
+                        createLog("TAG_PROTOCOL", "Successes and rename cmd is $blueRenamingCMD")
+                        _data.value = if (blueRenamingCMD != null) {
+                            timerStart = -1
+                            DataResponse.Success(
+                                BleSuccessStatus.BleRenamingStatusSuccess(blueRenamingCMD.toString())
+                            )
+                        } else {
+                            DataResponse.Error(
+                                BleErrorStatus.BleRenamingStatusError(
+                                    "Failed to Renaming the CMD",
+                                    null
+                                ), null
+                            )
                         }
                     }
                 }
@@ -331,7 +341,7 @@ class BleDeviceCommunicationRepository(
 
     override fun onSerialIoError(e: Exception?) {
         coroutineScope.launch {
-            createLog("BLE_SERIAL_Error"," Serial IO ${e?.localizedMessage}")
+            createLog("BLE_SERIAL_Error", " Serial IO ${e?.localizedMessage}")
             val err = if (e == null) "Unknown Error for While Initialing Service" else null
             _data.value = DataResponse.Error(BleErrorStatus.BleSetUpConnectionError(err, e), null)
         }

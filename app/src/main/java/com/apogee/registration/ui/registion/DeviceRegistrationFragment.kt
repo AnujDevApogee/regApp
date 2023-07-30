@@ -127,8 +127,8 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.savePersonCheckResponse.collect {
-                    if (it!=null){
-                        when(it){
+                    if (it != null) {
+                        when (it) {
                             is DataResponse.Error -> {
                                 createLog(
                                     "BLE_INFO",
@@ -255,7 +255,10 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                                     "BLE_INFO",
                                     "Subscription_Date_CONFIRM Response Success is ${it.data}"
                                 )
-                                viewModel.sendRequest(it.data as String,BleHelper.DEVICEREGCONFIRM.name)
+                                viewModel.sendRequest(
+                                    it.data as String,
+                                    BleHelper.DEVICEREGCONFIRM.name
+                                )
                             }
                         }
                     }
@@ -371,7 +374,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                                 if (it.data is String?) {
                                     createLog("BLE_INFO", " Success ${it.data}")
                                 }
-                                if (it.data is BleSuccessStatus){
+                                if (it.data is BleSuccessStatus) {
                                     bleSuccess(it.data)
                                 }
                             }
@@ -383,7 +386,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     }
 
     private fun bleSuccess(data: BleSuccessStatus) {
-        when(data){
+        when (data) {
             is BleSuccessStatus.BleConnectSuccess -> {
                 createLog(
                     "BLE_INFO",
@@ -549,6 +552,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
 
     override fun onPause() {
         super.onPause()
+        showToastMsg("Device Disconnected!!")
         viewModel.disconnect()
     }
 }

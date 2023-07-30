@@ -1,6 +1,6 @@
 package com.apogee.registration.user_case
 
-class BlueProtocolFilter {
+class BleProtocolFilter {
     companion object {
         fun getImeiNumber(res: String): String? {
             return if (res.contains("$$$$,03") || res.contains("$$$$,3")
