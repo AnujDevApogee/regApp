@@ -14,7 +14,7 @@
     <string name="model_name">Model Name</string>
     <string name="model_no">Model No</string>
     <string name="sub_date">Subscription Date</string>
-    <string name="sub_date_month">mm/yy/dd</string>
+    <string name="sub_date_month">dd/mm/yyyy</string>
     <string name="dn_btn">Confirm</string>
     <string name="logout_desc">Are you sure you want to Logout</string>
 

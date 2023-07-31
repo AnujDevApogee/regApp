@@ -8,22 +8,31 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.apogee.registration.R
 import com.apogee.registration.databinding.DeviceRegistrationLayoutBinding
 import com.apogee.registration.datastore.RegistrationAppSharedPref
+import com.apogee.registration.dialog.ProgressDialog
 import com.apogee.registration.model.BleErrorStatus
 import com.apogee.registration.model.BleLoadingStatus
 import com.apogee.registration.model.BleSuccessStatus
 import com.apogee.registration.model.DeviceRegModel
+import com.apogee.registration.model.pb.BlePbError
+import com.apogee.registration.model.pb.BlePbLoading
+import com.apogee.registration.model.pb.BlePbSuccess
 import com.apogee.registration.user_case.DateConverter
 import com.apogee.registration.utils.BleCmd
 import com.apogee.registration.utils.BleHelper
 import com.apogee.registration.utils.DataResponse
+import com.apogee.registration.utils.OnItemClickListener
 import com.apogee.registration.utils.calenderPicker
 import com.apogee.registration.utils.checkVaildString
 import com.apogee.registration.utils.createLog
 import com.apogee.registration.utils.displayActionBar
+import com.apogee.registration.utils.getDate
+import com.apogee.registration.utils.getTimeStamp
+import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.showToastMsg
 import com.apogee.registration.viewmodel.BleDeviceCommunicationViewModel
 import kotlinx.coroutines.launch
@@ -42,6 +51,8 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     private val sharedPref by lazy {
         RegistrationAppSharedPref.getInstance(requireActivity())
     }
+
+    private var progressDialog: ProgressDialog? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -130,6 +141,12 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                     if (it != null) {
                         when (it) {
                             is DataResponse.Error -> {
+                                showPb(
+                                    BlePbError.ValidateUserDetailError(
+                                        it.data as String?,
+                                        it.exception
+                                    )
+                                )
                                 createLog(
                                     "BLE_INFO",
                                     "SAVE_PERSON_RESPONSE Response Error is ${it.data} and ${it.exception?.localizedMessage}"
@@ -137,6 +154,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Loading -> {
+                                showPb(BlePbLoading.ValidateUserDetailLoading("${it.data}"))
                                 createLog(
                                     "BLE_INFO",
                                     "SAVE_PERSON_RESPONSE Response Loading is ${it.data}"
@@ -144,6 +162,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Success -> {
+                                showPb(BlePbSuccess.ValidateUserDetailSuccess("${it.data}"))
                                 createLog(
                                     "BLE_INFO",
                                     "SAVE_PERSON_RESPONSE Response SUCCESS is ${it.data}"
@@ -163,6 +182,12 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                     if (it != null) {
                         when (it) {
                             is DataResponse.Error -> {
+                                showPb(
+                                    BlePbError.BLERenamingAndApIError(
+                                        it.data as String?,
+                                        it.exception
+                                    )
+                                )
                                 createLog(
                                     "BLE_INFO",
                                     "BLE_DEVICE_STATUS_CHECK Response Error is ${it.data} and ${it.exception?.localizedMessage}"
@@ -170,6 +195,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Loading -> {
+                                showPb(BlePbLoading.BLERenamingAndApILoading("${it.data}"))
                                 createLog(
                                     "BLE_INFO",
                                     "BLE_DEVICE_STATUS_CHECK Response Loading is ${it.data}"
@@ -177,6 +203,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Success -> {
+                                showPb(BlePbSuccess.BLERenamingAndApISuccess("Ble Rename Successfully"))
                                 createLog(
                                     "BLE_INFO",
                                     "BLE_DEVICE_STATUS_CHECK Response Success is ${it.data}"
@@ -200,6 +227,12 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                     if (it != null) {
                         when (it) {
                             is DataResponse.Error -> {
+                                showPb(
+                                    BlePbError.BLESubBLEAndDeviceSubBleApiError(
+                                        it.data as String?,
+                                        it.exception
+                                    )
+                                )
                                 createLog(
                                     "BLE_INFO",
                                     "Subscription_Date_STATUS Response Error is ${it.data} and ${it.exception?.localizedMessage}"
@@ -207,6 +240,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Loading -> {
+                                showPb(BlePbLoading.BLESubBLEAndDeviceSubBleApiLoading("${it.data}"))
                                 createLog(
                                     "BLE_INFO",
                                     "Subscription_Date_STATUS Response Loading is ${it.data}"
@@ -214,6 +248,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Success -> {
+                                showPb(BlePbSuccess.BLESubBLEAndDeviceSubBleApiSuccess("Subscription Successful"))
                                 createLog(
                                     "BLE_INFO",
                                     "Subscription_Date_STATUS Response Success is ${it.data}"
@@ -237,6 +272,11 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                     if (it != null) {
                         when (it) {
                             is DataResponse.Error -> {
+                                showPb(
+                                    BlePbError.DeviceRegBleAndDeviceConfirmError(
+                                        it.data as String?, it.exception
+                                    )
+                                )
                                 createLog(
                                     "BLE_INFO",
                                     "Subscription_Date_CONFIRM Response Error is ${it.data} and ${it.exception?.localizedMessage}"
@@ -244,6 +284,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Loading -> {
+                                showPb(BlePbLoading.DeviceRegBleAndDeviceConfirmLoading("${it.data}"))
                                 createLog(
                                     "BLE_INFO",
                                     "Subscription_Date_CONFIRM Response Loading is ${it.data}"
@@ -255,6 +296,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                                     "BLE_INFO",
                                     "Subscription_Date_CONFIRM Response Success is ${it.data}"
                                 )
+                                showPb(BlePbSuccess.DeviceRegBleAndDeviceConfirmSuccess("Received Reg Token"))
                                 viewModel.sendRequest(
                                     it.data as String,
                                     BleHelper.DEVICEREGCONFIRM.name
@@ -274,6 +316,11 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                     if (it != null) {
                         when (it) {
                             is DataResponse.Error -> {
+                                showPb(
+                                    BlePbError.DeviceRegAndSubError(
+                                        it.data as String?, it.exception
+                                    )
+                                )
                                 createLog(
                                     "BLE_INFO",
                                     "DEVICE SUB_DATE API Error is ${it.data} and ${it.exception?.localizedMessage}"
@@ -281,16 +328,16 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Loading -> {
+                                showPb(BlePbLoading.DeviceRegAndSubLoading("${it.data}"))
                                 createLog(
-                                    "BLE_INFO",
-                                    "DEVICE SUB_DATE API LOADING is ${it.data}"
+                                    "BLE_INFO", "DEVICE SUB_DATE API LOADING is ${it.data}"
                                 )
                             }
 
                             is DataResponse.Success -> {
+                                showPb(BlePbSuccess.DeviceRegAndSubSuccess("Data Saved"))
                                 createLog(
-                                    "BLE_INFO",
-                                    "DEVICE SUB_DATE API Success is ${it.data}"
+                                    "BLE_INFO", "DEVICE SUB_DATE API Success is ${it.data}"
                                 )
 
                                 viewModel.sendRequest(
@@ -313,6 +360,11 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                     if (it != null) {
                         when (it) {
                             is DataResponse.Error -> {
+                                showPb(
+                                    BlePbError.DeviceRegAndSubError(
+                                        it.data as String?, it.exception
+                                    )
+                                )
                                 createLog(
                                     "BLE_INFO",
                                     "DEVICE REG API Error is ${it.data} and ${it.exception?.localizedMessage}"
@@ -320,6 +372,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
                             }
 
                             is DataResponse.Loading -> {
+                                showPb(BlePbLoading.DeviceRegAndSubLoading("${it.data}"))
                                 createLog("BLE_INFO", "DEVICE REG API LOADING ${it.data}")
                             }
 
@@ -396,11 +449,10 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             }
 
             is BleSuccessStatus.BleImeiNumberSuccess -> {
+                showPb(BlePbSuccess.ConnectionAndImeiSuccess("Imei Number ${data.data}"))
                 createLog(
-                    "BLE_INFO",
-                    "IMEI  Ble Connection Success-> ${data.data} "
+                    "BLE_INFO", "IMEI  Ble Connection Success-> ${data.data} "
                 )
-                showToastMsg("$data")
                 deviceRegModel?.let { model ->
                     model.imei = data.data as String
                     viewModel.sendDeviceReg(model)
@@ -436,35 +488,38 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     private fun bleLoading(data: BleLoadingStatus) {
         when (data) {
             is BleLoadingStatus.BleConnectDeviceLoading -> {
+                showPb(BlePbLoading.ConnectionAndImeiLoading(data.msg))
                 createLog(
-                    "BLE_INFO",
-                    "Ble Connection Loading -> ${data.msg} "
+                    "BLE_INFO", "Ble Connection Loading -> ${data.msg} "
                 )
             }
 
             is BleLoadingStatus.BleSetUpConnectionLoading -> {
+                showPb(BlePbLoading.ConnectionAndImeiLoading(data.msg))
                 createLog(
-                    "BLE_INFO",
-                    "Ble Connection Loading -> ${data.msg} "
+                    "BLE_INFO", "Ble Connection Loading -> ${data.msg} "
                 )
             }
 
             is BleLoadingStatus.ImeiNumberLoading -> {
+                showPb(BlePbLoading.ConnectionAndImeiLoading(data.msg))
                 createLog(
-                    "BLE_INFO",
-                    "Ble Connection Loading -> ${data.msg} "
+                    "BLE_INFO", "Ble Connection Loading -> ${data.msg} "
                 )
             }
 
             is BleLoadingStatus.BleDeviceRegRecordLoading -> {
+                showPb(BlePbLoading.DeviceRegBleAndDeviceConfirmLoading(data.msg))
                 createLog("BLE_INFO", "Ble Record Loading ${data.msg}")
             }
 
             is BleLoadingStatus.BleDeviceConfirmationLoading -> {
+                showPb(BlePbLoading.BLESubBLEAndDeviceSubBleApiLoading(data.msg))
                 createLog("BLE_INFO", "Ble DEVICE_REG_CONNECTION Loading ${data.msg}")
             }
 
             is BleLoadingStatus.BleRenamingStatusLoading -> {
+                showPb(BlePbLoading.BLERenamingAndApILoading(data.msg))
                 createLog("BLE_INFO", "Ble BLE_RENAME Loading ${data.msg}")
             }
         }
@@ -473,6 +528,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     private fun bleError(data: BleErrorStatus) {
         when (data) {
             is BleErrorStatus.BleConnectError -> {
+                showPb(BlePbError.ConnectionAndImeiError(data.error, data.e))
                 createLog(
                     "BLE_INFO",
                     "Ble Connection Error -> ${data.error} and ${data.e?.localizedMessage}"
@@ -480,13 +536,14 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             }
 
             is BleErrorStatus.BleImeiError -> {
+                showPb(BlePbError.ConnectionAndImeiError(data.error, data.e))
                 createLog(
-                    "BLE_INFO",
-                    "Ble BleImei Error -> ${data.error} and ${data.e?.localizedMessage}"
+                    "BLE_INFO", "Ble BleImei Error -> ${data.error} and ${data.e?.localizedMessage}"
                 )
             }
 
             is BleErrorStatus.BleSetUpConnectionError -> {
+                showPb(BlePbError.ConnectionAndImeiError(data.error, data.e))
                 createLog(
                     "BLE_INFO",
                     "Ble setupConnectionError -> ${data.error} and ${data.e?.localizedMessage}"
@@ -494,6 +551,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             }
 
             is BleErrorStatus.BleDeviceRegRecordError -> {
+                showPb(BlePbError.DeviceRegBleAndDeviceConfirmError(data.error, data.e))
                 createLog(
                     "BLE_INFO",
                     "Ble Device Reg Error -> ${data.error} and ${data.e?.localizedMessage}"
@@ -501,6 +559,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             }
 
             is BleErrorStatus.BleDeviceConfirmationError -> {
+                showPb(BlePbError.BLESubBLEAndDeviceSubBleApiError(data.error, data.e))
                 createLog(
                     "BLE_INFO",
                     "Ble DEVICE REG Error -> ${data.error} and ${data.e?.localizedMessage}"
@@ -508,6 +567,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             }
 
             is BleErrorStatus.BleRenamingStatusError -> {
+                showPb(BlePbError.BLERenamingAndApIError(data.error, data.e))
                 createLog(
                     "BLE_INFO",
                     "Ble BLE_RENAME Error -> ${data.error} and ${data.e?.localizedMessage}"
@@ -516,8 +576,45 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         }
     }
 
+
+    private fun showPb(ble: Any) {
+        if (activity == null && !isAdded) {
+            showToastMsg("Unknown error Try Again")
+            findNavController().popBackStack()
+            return
+        }
+        if (progressDialog == null && activity != null && isAdded) {
+            progressDialog = ProgressDialog(requireActivity(), object : OnItemClickListener {
+                override fun <T> onClickListener(response: T) {
+                    if (response == null) {
+                        progressDialog?.dismiss()
+                        findNavController().popBackStack()
+                    }
+                    if (response is DataResponse.Error<*>) {
+                        dialog("Failed", "${response.data}")
+                    }
+                    if (response is DataResponse.Success<*>) {
+                        dialog("Success", "${response.data}")
+                    }
+                }
+
+            })
+        }
+        if (ble is BlePbSuccess) {
+            progressDialog?.showSuccess(ble)
+        }
+        if (ble is BlePbError) {
+            progressDialog?.showPbError(ble)
+        }
+
+        if (ble is BlePbLoading) {
+            progressDialog?.showLoading(ble)
+        }
+    }
+
     private fun setupUI() {
         binding.bleNme.setText(args.devicename)
+        binding.subscriptionDate.setText(getDate(getTimeStamp().timeInMillis))
         binding.modelNo.apply {
             setText(resources.getStringArray(R.array.model_ls)[0].toString())
             setAdapter(setAdaptor(R.array.model_ls))
@@ -548,6 +645,12 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             android.R.layout.select_dialog_item,
             resources.getStringArray(strAdp)
         )
+    }
+
+    private fun dialog(title: String, msg: String) {
+        activity?.setUpDialogBox(title, msg, "OK", success = {
+
+        }, cancelListener = {})
     }
 
     override fun onPause() {

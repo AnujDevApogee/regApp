@@ -20,6 +20,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavController
 import androidx.navigation.NavDirections
 import com.google.android.material.datepicker.CalendarConstraints
+import com.google.android.material.datepicker.CalendarConstraints.DateValidator
 import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.gson.Gson
@@ -160,7 +161,9 @@ fun NavController.safeNavigate(direction: Int) {
 fun calenderPicker(
     fragmentManager: FragmentManager, cancel: () -> Unit, dateListener: (txt: String) -> Unit
 ) {
-    val constraint = CalendarConstraints.Builder().setValidator(DateValidatorPointForward.now())
+
+    val constraint = CalendarConstraints.Builder().setValidator(DateValidatorPointForward.from(
+        getTimeStamp().timeInMillis))
     val datePicker = MaterialDatePicker.Builder.datePicker().setTitleText("Select Booking Date")
         .setCalendarConstraints(constraint.build()).build()
 
@@ -176,11 +179,20 @@ fun calenderPicker(
     }
 
     datePicker.addOnPositiveButtonClickListener { time ->
-        val calendar: Calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        calendar.timeInMillis = time
-        val format = SimpleDateFormat("dd/MM/yyyy")//"yyyy-MM-dd"
-        val formattedDate: String = format.format(calendar.time)
-        dateListener.invoke(formattedDate)
+        val calendarType: Calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        calendarType.timeInMillis = time
+        dateListener.invoke(getDate(calendarType.timeInMillis))
     }
     datePicker.show(fragmentManager, "DatePicker")
+}
+
+fun getDate(timeStamp:Long,formatType:String="dd/MM/yyyy"): String {
+    val format = SimpleDateFormat(formatType)//"yyyy-MM-dd"
+    return format.format(timeStamp)
+}
+
+fun getTimeStamp(timeForward:Int=7): Calendar {
+    val calendar = Calendar.getInstance()
+    calendar.add(Calendar.DAY_OF_MONTH, timeForward) // Adding 7 days
+    return calendar
 }

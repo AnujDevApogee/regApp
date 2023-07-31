@@ -346,8 +346,16 @@ class BleDeviceCommunicationRepository(
         coroutineScope.launch {
             createLog("BLE_SERIAL_Error", " Serial IO ${e?.localizedMessage}")
             val err = if (e == null) "Unknown Error for While Initialing Service" else null
-            if (blueRenamingCMD==null && (e?.localizedMessage?.trim())!="gatt status 8")
-            _data.value = DataResponse.Error(BleErrorStatus.BleSetUpConnectionError(err, e), null)
+             if (blueRenamingCMD==null && (e?.localizedMessage?.trim())!="gatt status 8") {
+                 _data.value =  DataResponse.Error(BleErrorStatus.BleSetUpConnectionError(err, e), null)
+            }else if (blueRenamingCMD!=null && (e?.localizedMessage?.trim())=="gatt status 8"){
+                timerStart=-1
+                val cmd=blueRenamingCMD
+                 blueRenamingCMD=null
+                 _data.value =  DataResponse.Success(
+                    BleSuccessStatus.BleRenamingStatusSuccess(cmd.toString())
+                )
+            }
         }
     }
 
