@@ -159,12 +159,19 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
             binding.pbBle.isVisible = true
             binding.msgPb.text = txt
             binding.msgPb.show()
+            binding.recycleViewBle.hide()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.startConnection()
     }
 
     private fun hidePb() {
         binding.pbBle.isVisible = false
         binding.msgPb.hide()
+        binding.recycleViewBle.show()
         binding.swipeRefresh.isRefreshing = false
     }
 }

@@ -31,7 +31,6 @@ class BleConnectionViewModel(application: Application) : AndroidViewModel(applic
 
 
     init {
-        startConnection()
         listenerBle()
     }
 
