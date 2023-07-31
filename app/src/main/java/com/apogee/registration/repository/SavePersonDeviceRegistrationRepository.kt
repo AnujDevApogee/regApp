@@ -30,7 +30,7 @@ class SavePersonDeviceRegistrationRepository : CustomCallback {
     }
 
 
-    private val searchString = "Registration, Ble Renaming and Subscription Successfull"
+    private val searchString = "Device Person Mapped Successfully"
 
     private var deviceName: String? = null
 

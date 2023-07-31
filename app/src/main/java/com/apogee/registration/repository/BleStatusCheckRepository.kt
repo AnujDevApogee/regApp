@@ -5,6 +5,7 @@ import com.apogee.registration.instance.ApiInstance
 import com.apogee.registration.utils.ApiUrl
 import com.apogee.registration.utils.DataResponse
 import com.apogee.registration.utils.checkVaildString
+import com.apogee.registration.utils.createLog
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -41,8 +42,9 @@ class BleStatusCheckRepository : CustomCallback {
                 deviceName=req.split(",".toRegex()).let {
                     Pair(it[5],it[2])//Device Name, Device Reg No
                 }
+                createLog("CREATE_LS","Device Name $deviceName and $req for url ${ApiUrl.bleStatusCheck}")
                 api.postDataWithContentType(
-                    req,
+                    req.trim(),
                     this@BleStatusCheckRepository,
                     ApiUrl.bleStatusCheck.first,
                     ApiUrl.bleStatusCheck.second,
@@ -64,6 +66,7 @@ class BleStatusCheckRepository : CustomCallback {
 
                         try {
                             val deviceRegResponse = requestBody.string()
+                            createLog("CREATE_LS","Response Body $deviceRegResponse")
                             if (checkVaildString(deviceRegResponse)) {
                                 _data.value =
                                     DataResponse.Error("Cannot Connection", null)
