@@ -25,6 +25,7 @@ import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.show
 import com.apogee.registration.utils.showToastMsg
 import com.apogee.registration.viewmodel.BleConnectionViewModel
+import com.google.android.material.transition.MaterialFadeThrough
 import kotlinx.coroutines.launch
 
 @SuppressLint("MissingPermission")
@@ -61,6 +62,17 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
 
                 })
         }
+    }
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val fadeThrough = MaterialFadeThrough().apply {
+            duration = 1000
+        }
+        enterTransition = fadeThrough
+        reenterTransition = fadeThrough
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

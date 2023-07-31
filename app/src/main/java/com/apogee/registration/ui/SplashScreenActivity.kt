@@ -1,8 +1,9 @@
 package com.apogee.registration.ui
 
 import android.annotation.SuppressLint
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.apogee.registration.databinding.ActivityMainBinding
@@ -13,6 +14,7 @@ import com.apogee.registration.utils.goToNextActivity
 import com.permissionx.guolindev.PermissionX
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+
 
 @SuppressLint("CustomSplashScreen")
 class SplashScreenActivity : AppCompatActivity() {
@@ -26,6 +28,13 @@ class SplashScreenActivity : AppCompatActivity() {
         lifecycleScope.launch {
             delay(2000)
             getToPermission()
+        }
+        try {
+            val pInfo: PackageInfo = packageManager.getPackageInfo(packageName, 0)
+            val version = pInfo.versionName
+            "v$version".let { binding.versionName.text= it }
+        } catch (e: PackageManager.NameNotFoundException) {
+            e.printStackTrace()
         }
 
     }

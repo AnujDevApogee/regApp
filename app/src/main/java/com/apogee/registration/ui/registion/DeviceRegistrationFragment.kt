@@ -35,6 +35,7 @@ import com.apogee.registration.utils.getTimeStamp
 import com.apogee.registration.utils.setUpDialogBox
 import com.apogee.registration.utils.showToastMsg
 import com.apogee.registration.viewmodel.BleDeviceCommunicationViewModel
+import com.google.android.material.transition.MaterialFadeThrough
 import kotlinx.coroutines.launch
 
 @Suppress("UNCHECKED_CAST")
@@ -53,6 +54,19 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     }
 
     private var progressDialog: ProgressDialog? = null
+
+
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        val fadeThrough = MaterialFadeThrough().apply {
+            duration = 1000
+        }
+        enterTransition = fadeThrough
+        reenterTransition = fadeThrough
+
+    }
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
