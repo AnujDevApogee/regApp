@@ -73,7 +73,7 @@ class BleDeviceConnectionRepository(
             _bleConnection.value =
                 (DataResponse.Loading("Scanning Ble devices... ${getEmojiByUnicode(0x1F50E)}"))
             bleScanner.startScan(null, scanSetting.build(), scanCallback)
-            delay(5000)
+            delay(2500)
             _bleConnection.value = (DataResponse.Success(
                 BleDeviceConnection(
                     deviceList,

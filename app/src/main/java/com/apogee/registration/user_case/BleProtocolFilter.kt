@@ -1,5 +1,8 @@
 package com.apogee.registration.user_case
 
+import android.content.Context
+import com.apogee.registration.R
+
 class BleProtocolFilter {
     companion object {
         fun getImeiNumber(res: String): String? {
@@ -57,6 +60,31 @@ class BleProtocolFilter {
             } catch (e: Exception) {
                 null
             }
+        }
+
+
+        fun getModelNameAndNumber(device: String, context: Context): Pair<Int, Int> {
+            val modelNo = context.resources.getStringArray(R.array.model_ls)
+            val modelName = context.resources.getStringArray(R.array.model_name_ls)
+            var indexNo = 0
+            var indexName = 0
+            val deviceName=device.split("-".toRegex()).first()
+            modelName.forEachIndexed { index, s ->
+                if (s.contains(deviceName)) {
+                    indexName = index
+                    return@forEachIndexed
+                }
+            }
+
+            modelNo.forEachIndexed { indx, str ->
+                if (str.contains(deviceName)){
+                    indexNo=indx
+                    return@forEachIndexed
+                }
+            }
+
+            return Pair(indexName,indexNo)
+
         }
 
     }

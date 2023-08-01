@@ -21,6 +21,7 @@ import com.apogee.registration.model.DeviceRegModel
 import com.apogee.registration.model.pb.BlePbError
 import com.apogee.registration.model.pb.BlePbLoading
 import com.apogee.registration.model.pb.BlePbSuccess
+import com.apogee.registration.user_case.BleProtocolFilter
 import com.apogee.registration.user_case.DateConverter
 import com.apogee.registration.utils.BleCmd
 import com.apogee.registration.utils.BleHelper
@@ -628,9 +629,13 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
 
     private fun setupUI() {
         binding.bleNme.setText(args.devicename)
+
+
+        val modelAndNo=BleProtocolFilter.getModelNameAndNumber(args.devicename,requireContext())
+
         binding.subscriptionDate.setText(getDate(getTimeStamp().timeInMillis))
         binding.modelNo.apply {
-            setText(resources.getStringArray(R.array.model_ls)[0].toString())
+            setText(resources.getStringArray(R.array.model_ls)[modelAndNo.second].toString())
             setAdapter(setAdaptor(R.array.model_ls))
         }
         binding.deviceLs.apply {
@@ -642,7 +647,7 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             setAdapter(setAdaptor(R.array.manufact_ls))
         }
         binding.modelNameLs.apply {
-            setText(resources.getStringArray(R.array.model_name_ls)[0].toString())
+            setText(resources.getStringArray(R.array.model_name_ls)[modelAndNo.first].toString())
             setAdapter(setAdaptor(R.array.model_name_ls))
         }
         binding.subscriptionDate.setOnClickListener {
