@@ -297,6 +297,7 @@ class ProgressDialog(private val context: Activity, private val listener: OnItem
                     img.setImageResource(R.drawable.ic_success)
                     pbTxt.apply {
                         text = "${blePbSuccess.data}"
+                        maxLines = 2
                         setTextColor(Color.BLACK)
                     }
                 }
@@ -339,7 +340,7 @@ class ProgressDialog(private val context: Activity, private val listener: OnItem
                         setTextColor(Color.BLACK)
                     }
                 }
-                binding.retry.text = "Continue ${getEmojiByUnicode(0x2705)}"
+                "Continue ${getEmojiByUnicode(0x2705)}".let { binding.retry.text = it }
                 binding.retry.show()
                 listener.onClickListener(DataResponse.Success("${blePbSuccess.data}"))
             }
