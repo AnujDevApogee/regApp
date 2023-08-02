@@ -337,6 +337,7 @@ class ProgressDialog(private val context: Activity, private val listener: OnItem
                     img.setImageResource(R.drawable.ic_success)
                     pbTxt.apply {
                         text = "${blePbSuccess.data}"
+                        maxLines=2
                         setTextColor(Color.BLACK)
                     }
                 }

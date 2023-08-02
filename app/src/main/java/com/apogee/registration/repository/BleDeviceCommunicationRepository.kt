@@ -119,6 +119,48 @@ class BleDeviceCommunicationRepository(
                 }
                 delay(200)
                 service!!.write(byteArray)
+                while (timerStart != (-1).toLong()) {
+                    if (TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
+                        timerStart = -1
+                        _data.value = when (valueOf(bleStatus!!)) {
+                            IEMINUMBER -> {
+                                DataResponse.Error(
+                                    BleErrorStatus.BleImeiError(
+                                        "Time-out Cannot find the Imei Number",
+                                        null
+                                    ), null
+                                )
+                            }
+
+                            DEVICEREGRECORD -> {
+                                DataResponse.Error(
+                                    BleErrorStatus.BleDeviceRegRecordError(
+                                        "Time-out Cannot find the Device Subscription Reg Protocol",
+                                        null
+                                    ), null
+                                )
+                            }
+
+                            DEVICEREGCONFIRM -> {
+                                DataResponse.Error(
+                                    BleErrorStatus.BleDeviceConfirmationError(
+                                        "Time-Out Cannot find the Device Subscription Confirmation Protocol",
+                                        null
+                                    ), null
+                                )
+                            }
+
+                            BLERENAMESTATUS -> {
+                                DataResponse.Error(
+                                    BleErrorStatus.BleRenamingStatusError(
+                                        "Time-out Connote Failed to Renaming the Response from Ble ",
+                                        null
+                                    ), null
+                                )
+                            }
+                        }
+                    }
+                }
             } catch (e: Exception) {
                 timerStart = -1
                 _data.value = if (bleStatus == null) {
@@ -209,41 +251,27 @@ class BleDeviceCommunicationRepository(
             coroutineScope.launch {
                 when (valueOf(bleStatus!!)) {
                     IEMINUMBER -> {
-                        if (timerStart != (-1).toLong()) {
-                            if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
-                                try {
-                                    if (!checkVaildString(res)) {
-                                        BleProtocolFilter.getImeiNumber(res!!)?.let {
-                                            _data.value = DataResponse.Success(
-                                                BleSuccessStatus.BleImeiNumberSuccess(it)
-                                            )
-                                            timerStart = -1
-                                        }
-                                    }
-                                } catch (e: Exception) {
-                                    _data.value = DataResponse.Error(
-                                        BleErrorStatus.BleImeiError(
-                                            "Re-start the Process Again",
-                                            e
-                                        ), null
+                        try {
+                            if (!checkVaildString(res)) {
+                                BleProtocolFilter.getImeiNumber(res!!)?.let {
+                                    _data.value = DataResponse.Success(
+                                        BleSuccessStatus.BleImeiNumberSuccess(it)
                                     )
+                                    timerStart = -1
                                 }
-
-                            } else {
-                                timerStart = -1
-                                _data.value = DataResponse.Error(
-                                    BleErrorStatus.BleImeiError(
-                                        "Cannot find the Imei Number",
-                                        null
-                                    ), null
-                                )
                             }
+                        } catch (e: Exception) {
+                            timerStart = -1
+                            _data.value = DataResponse.Error(
+                                BleErrorStatus.BleImeiError(
+                                    "Re-start the Process Again",
+                                    e
+                                ), null
+                            )
                         }
                     }
 
                     DEVICEREGRECORD -> {
-                        if (timerStart != (-1).toLong()) {
-                            if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
                                 try {
                                     if (!checkVaildString(res)) {
                                         BleProtocolFilter.getDeviceGeogProtocol(res!!)?.let {
@@ -254,61 +282,41 @@ class BleDeviceCommunicationRepository(
                                         }
                                     }
                                 } catch (e: Exception) {
+                                    timerStart = -1
                                     _data.value = DataResponse.Error(
                                         BleErrorStatus.BleDeviceRegRecordError(
                                             "Re-start the Process Again", e
                                         ), null
                                     )
                                 }
-
-                            } else {
-                                timerStart = -1
-                                _data.value = DataResponse.Error(
-                                    BleErrorStatus.BleDeviceRegRecordError(
-                                        "Cannot find the Device  Subscription Reg Protocol", null
-                                    ), null
-                                )
-                            }
-                        }
                     }
 
                     DEVICEREGCONFIRM -> {
-                        if (timerStart != (-1).toLong()) {
-                            if (!TimeCompare.isTimeOut(timerStart, System.currentTimeMillis())) {
-                                try {
-                                    if (!checkVaildString(res)) {
-                                        BleProtocolFilter.getDeviceBleRegConfirm(res!!)?.let {
-                                            _data.value = if (it.isNotEmpty() && it.isNotBlank()) {
-                                                DataResponse.Success(
-                                                    BleSuccessStatus.BleDeviceConfirmationSuccess(it)
-                                                )
-                                            } else {
-                                                DataResponse.Error(
-                                                    BleErrorStatus.BleDeviceConfirmationError(
-                                                        "Failed to verify subscription", null
-                                                    ), null
-                                                )
-                                            }
-                                            timerStart = -1
-                                        }
+                        try {
+                            if (!checkVaildString(res)) {
+                                BleProtocolFilter.getDeviceBleRegConfirm(res!!)?.let {
+                                    _data.value = if (it.isNotEmpty() && it.isNotBlank()) {
+                                        DataResponse.Success(
+                                            BleSuccessStatus.BleDeviceConfirmationSuccess(it)
+                                        )
+                                    } else {
+                                        DataResponse.Error(
+                                            BleErrorStatus.BleDeviceConfirmationError(
+                                                "Failed to verify subscription", null
+                                            ), null
+                                        )
                                     }
-                                } catch (e: Exception) {
-                                    _data.value = DataResponse.Error(
-                                        BleErrorStatus.BleDeviceConfirmationError(
-                                            "Re-start the Process Again", e
-                                        ), null
-                                    )
+                                    timerStart = -1
                                 }
-
-                            } else {
-                                timerStart = -1
-                                _data.value = DataResponse.Error(
-                                    BleErrorStatus.BleDeviceConfirmationError(
-                                        "Cannot find the Device Subscription Confirmation Protocol",
-                                        null
-                                    ), null
-                                )
                             }
+                        } catch (e: Exception) {
+                            timerStart = -1
+                            _data.value = DataResponse.Error(
+                                BleErrorStatus.BleDeviceConfirmationError(
+                                    "Failed to Confirmation Registration. Re-start the Process Again ",
+                                    e
+                                ), null
+                            )
                         }
                     }
 
@@ -323,6 +331,7 @@ class BleDeviceCommunicationRepository(
                             )
 
                         } else {
+                            timerStart = -1
                             DataResponse.Error(
                                 BleErrorStatus.BleRenamingStatusError(
                                     "Failed to Renaming the CMD",
