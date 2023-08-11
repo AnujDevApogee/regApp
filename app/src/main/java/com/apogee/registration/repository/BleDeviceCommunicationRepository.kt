@@ -295,18 +295,19 @@ class BleDeviceCommunicationRepository(
                         try {
                             if (!checkVaildString(res)) {
                                 BleProtocolFilter.getDeviceBleRegConfirm(res!!)?.let {
-                                    _data.value = if (it.isNotEmpty() && it.isNotBlank()) {
-                                        DataResponse.Success(
+                                    if (it.isNotEmpty() && it.isNotBlank()) {
+                                        _data.value = DataResponse.Success(
                                             BleSuccessStatus.BleDeviceConfirmationSuccess(it)
                                         )
-                                    } else {
+                                        timerStart = -1
+                                    } /*else {
                                         DataResponse.Error(
                                             BleErrorStatus.BleDeviceConfirmationError(
                                                 "Failed to verify subscription", null
                                             ), null
                                         )
-                                    }
-                                    timerStart = -1
+                                    }*/
+
                                 }
                             }
                         } catch (e: Exception) {
@@ -322,22 +323,14 @@ class BleDeviceCommunicationRepository(
 
                     BLERENAMESTATUS -> {
                         createLog("TAG_PROTOCOL", "Successes and rename cmd is $blueRenamingCMD")
-                        _data.value = if (blueRenamingCMD != null) {
+                        if (blueRenamingCMD != null) {
                             timerStart = -1
                             val cmd=blueRenamingCMD
                             blueRenamingCMD=null
-                            DataResponse.Success(
+                            _data.value = DataResponse.Success(
                                 BleSuccessStatus.BleRenamingStatusSuccess(cmd.toString())
                             )
 
-                        } else {
-                            timerStart = -1
-                            DataResponse.Error(
-                                BleErrorStatus.BleRenamingStatusError(
-                                    "Failed to Renaming the CMD",
-                                    null
-                                ), null
-                            )
                         }
                     }
                 }

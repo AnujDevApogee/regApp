@@ -57,6 +57,8 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
     private var progressDialog: ProgressDialog? = null
 
 
+    private var calenderFlag = true
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -651,10 +653,13 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             setAdapter(setAdaptor(R.array.model_name_ls))
         }
         binding.subscriptionDate.setOnClickListener {
-            calenderPicker(parentFragmentManager, {}, {
-                binding.subscriptionDate.setText(it)
-                createLog("TAG_INFO", "${DateConverter.getConvertDate(it)}")
-            })
+            if (calenderFlag) {
+                calenderPicker(parentFragmentManager, {}, {
+                    binding.subscriptionDate.setText(it)
+                    createLog("TAG_INFO", "${DateConverter.getConvertDate(it)}")
+                })
+            }
+            calenderFlag=!calenderFlag
         }
     }
 
