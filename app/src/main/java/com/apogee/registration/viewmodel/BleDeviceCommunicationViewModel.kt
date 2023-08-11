@@ -83,6 +83,17 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
     }
 
 
+
+    fun clearOnResume(){
+        _bleCommunicationData.value=null
+        _deviceRegResponse.value=null
+        _deviceSubRecordDateResponse.value=null
+        _deviceSubDateConfirmResponse.value=null
+        _deviceSubDateStatusResponse.value=null
+        _bleStatusCheckResponse.value=null
+        _savePersonCheckResponse.value=null
+    }
+
     fun setUpConnection() {
         deviceConnectionRepo.setUpConnection()
     }

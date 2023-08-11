@@ -681,5 +681,6 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         super.onPause()
         showToastMsg("Device Disconnected!!")
         viewModel.disconnect()
+        viewModel.clearOnResume()
     }
 }
