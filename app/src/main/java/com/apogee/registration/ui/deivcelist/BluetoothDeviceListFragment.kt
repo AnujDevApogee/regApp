@@ -10,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.apogee.registration.R
 import com.apogee.registration.adaptor.BleDeviceAdaptor
+import com.apogee.registration.adaptor.BleDeviceMultiAdaptor
 import com.apogee.registration.databinding.BluethoothDeviceListLayoutBinding
 import com.apogee.registration.datastore.RegistrationAppSharedPref
 import com.apogee.registration.model.BleDeviceConnection
@@ -38,7 +39,7 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
 
     private val viewModel: BleConnectionViewModel by viewModels()
 
-    private lateinit var bleAdaptor: BleDeviceAdaptor
+    private lateinit var bleAdaptor: BleDeviceMultiAdaptor
 
 
     private val mnuCallBack = object :
@@ -98,15 +99,16 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
 
     private fun setupRecycleAdaptor() {
         binding.recycleViewBle.apply {
-            bleAdaptor = BleDeviceAdaptor(itemClicked = {
+            bleAdaptor = BleDeviceMultiAdaptor {
                 createLog("BLE_CLICK", "$it")
                 val dir=BluetoothDeviceListFragmentDirections.actionDeviceListFragmentToDeviceRegistrationFragment(it.device.name,it.device.address)
                 findNavController().safeNavigate(dir)
-            })
+            }
             adapter = bleAdaptor
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     @SuppressLint("NotifyDataSetChanged")
     private fun getBleDevice() {
         viewModel.bleDeviceAvailable.observe(viewLifecycleOwner) {
@@ -123,40 +125,26 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
 
                 is DataResponse.Loading -> {
                     createLog("BLE_RES", " LOADING ${it.data} ")
-                    showPb((it.data as String?) ?: "")
+                    (it.data as List<BleDeviceConnection>).let {ls->
+                        bleAdaptor.notifyDataSetChanged()
+                        bleAdaptor.submitList(ls)
+                    }
                 }
 
                 is DataResponse.Success -> {
                     createLog("BLE_RES", " Success ${it.data} ")
                     hidePb()
-                    monitorBle(it.data as BleDeviceConnection)
-                }
-            }
-        }
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    private fun monitorBle(data: BleDeviceConnection) {
-        when (BleDeviceConnection.Companion.BleDeviceStatus.valueOf(data.status)) {
-
-            BleDeviceConnection.Companion.BleDeviceStatus.AVAILABLE -> {
-                try {
-                    bleAdaptor.notifyDataSetChanged()
-                    bleAdaptor.submitList(data.list)
-                    if (data.list.isEmpty()){
-                        binding.pbBle.invisible()
-                        "No Device Available ${getEmojiByUnicode(0x1F6F0)}".apply {
-                            binding.msgPb.text=this
-                            binding.msgPb.show()
-                        }
+                    (it.data as List<BleDeviceConnection>).let {ls->
+                        bleAdaptor.notifyDataSetChanged()
+                        bleAdaptor.submitList(ls)
                     }
-                } catch (e: Exception) {
-                    createLog("LOG_BLE_ADAPTOR", "TESTING  ${e.localizedMessage}")
-                    dialog("Failed", e.localizedMessage ?: "Unknown error")
+                    //monitorBle(it.data as BleDeviceConnection)
                 }
             }
         }
     }
+
+
 
     @Suppress("SameParameterValue")
     private fun dialog(title: String, msg: String) {
@@ -165,25 +153,12 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
         }, cancelListener = {})
     }
 
-
-    private fun showPb(txt: String) {
-        if (!binding.swipeRefresh.isRefreshing) {
-            binding.pbBle.isVisible = true
-            binding.msgPb.text = txt
-            binding.msgPb.show()
-            binding.recycleViewBle.hide()
-        }
-    }
-
     override fun onResume() {
         super.onResume()
         viewModel.startConnection()
     }
 
     private fun hidePb() {
-        binding.pbBle.isVisible = false
-        binding.msgPb.hide()
-        binding.recycleViewBle.show()
         binding.swipeRefresh.isRefreshing = false
     }
 }

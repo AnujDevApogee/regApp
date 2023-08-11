@@ -38,6 +38,7 @@ class BleDeviceConnectionRepository(
     private val scanSetting = ScanSettings.Builder().setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
 
     private val deviceList = mutableListOf<ScanResult>()
+    private val mainDeviceList = mutableListOf<BleDeviceConnection>()
 
 
     private val scanCallback = object : ScanCallback() {
@@ -55,6 +56,7 @@ class BleDeviceConnectionRepository(
                             it.device.address == result.device.address
                         }
                         if (res == null) {
+                            mainDeviceList.add(BleDeviceConnection.BleDevice(result))
                             deviceList.add(result)
                         }
                         //_bleConnection.value = DataResponse.Success(deviceList)
@@ -70,17 +72,22 @@ class BleDeviceConnectionRepository(
 
     suspend fun startConnection() {
         try {
+            val ls = mutableListOf<BleDeviceConnection>()
+            ls.addAll(mainDeviceList)
+            ls.add(
+                BleDeviceConnection.BleDeviceMessage(
+                    "Scanning Ble devices... ${
+                        getEmojiByUnicode(
+                            0x1F50E
+                        )
+                    }"
+                )
+            )
             _bleConnection.value =
-                (DataResponse.Loading("Scanning Ble devices... ${getEmojiByUnicode(0x1F50E)}"))
+                (DataResponse.Loading(ls))
             bleScanner.startScan(null, scanSetting.build(), scanCallback)
             delay(2500)
-            _bleConnection.value = (DataResponse.Success(
-                BleDeviceConnection(
-                    deviceList,
-                    "",
-                    BleDeviceConnection.Companion.BleDeviceStatus.AVAILABLE.name
-                )
-            ))
+            _bleConnection.value = (DataResponse.Success(mainDeviceList))
             bleScanner.stopScan(scanCallback)
         } catch (e: Exception) {
             _bleConnection.value = (DataResponse.Error(null, e))

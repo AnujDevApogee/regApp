@@ -36,34 +36,6 @@
                 tools:listitem="@layout/ble_device_item" />
 
 
-            <com.google.android.material.progressindicator.LinearProgressIndicator
-                android:id="@+id/pb_ble"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20sp"
-                android:layout_marginEnd="20dp"
-                android:indeterminate="true"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:trackCornerRadius="20dp" />
-
-
-            <TextView
-                android:id="@+id/msg_pb"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:textColor="@color/md_theme_dark_scrim"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:layout_constraintLeft_toLeftOf="@id/pb_ble"
-                app:layout_constraintRight_toRightOf="@id/pb_ble"
-                app:layout_constraintTop_toBottomOf="@id/pb_ble"
-                tools:text="dgflk khlfdhdl fhklgfl fhlhlkfhkldfhlfhkldfhlk" />
-
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
