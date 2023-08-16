@@ -125,6 +125,7 @@ class BluetoothDeviceListFragment : Fragment(R.layout.bluethooth_device_list_lay
 
                 is DataResponse.Loading -> {
                     createLog("BLE_RES", " LOADING ${it.data} ")
+                    binding.swipeRefresh.isRefreshing=true
                     (it.data as List<BleDeviceConnection>).let {ls->
                         bleAdaptor.notifyDataSetChanged()
                         bleAdaptor.submitList(ls)
