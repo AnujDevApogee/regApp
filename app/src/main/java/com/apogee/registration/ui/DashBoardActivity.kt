@@ -10,6 +10,7 @@ import com.apogee.registration.databinding.DashboardActivtyLayoutBinding
 import com.apogee.registration.instance.BluetoothCommunication
 import com.apogee.registration.utils.BlueToothBroadCastReceiver
 import com.apogee.registration.utils.createLog
+import com.apogee.registration.utils.setUpDialogBox
 
 class DashBoardActivity : AppCompatActivity(){
     private lateinit var binding: DashboardActivtyLayoutBinding
@@ -29,6 +30,9 @@ class DashBoardActivity : AppCompatActivity(){
                 showBluetoothEnableDialog()
             }
         }
+        setUpDialogBox("Information", "This App Version is Only valid for Protocol Version 3.3", "OK", success = {
+
+        }, cancelListener = {})
     }
 
     override fun onStart() {
