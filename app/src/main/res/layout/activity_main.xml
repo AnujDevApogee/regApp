@@ -9,9 +9,9 @@
 
 
     <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:scaleType="fitXY"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerInside"
         android:src="@drawable/launch"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
