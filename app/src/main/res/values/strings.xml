@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">registration</string>
+    <string name="app_name">Registration</string>
     <string name="usr_nm">UserName</string>
     <string name="pass">Password</string>
     <string name="logn">Login</string>
