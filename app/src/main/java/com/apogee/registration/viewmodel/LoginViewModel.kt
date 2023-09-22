@@ -1,11 +1,13 @@
 package com.apogee.registration.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.apogee.registration.model.LoginRequest
+import com.apogee.registration.repository.GetModelAllRepository
 import com.apogee.registration.repository.LoginRepository
 import com.apogee.registration.utils.ApiUrl
 import com.apogee.registration.utils.DataResponse
@@ -19,6 +21,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     private val app = application
     private var repository = LoginRepository(application)
+
+    private var getModuleRepository = GetModelAllRepository(application)
+
+    private val _moduleResponse = MutableLiveData<DataResponse<out Any?>>()
+    val moduleResponse: LiveData<DataResponse<out Any?>>
+        get() = _moduleResponse
 
 
     private val _loginResponse = MutableLiveData<DataResponse<out Any?>>()
@@ -65,6 +73,9 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         viewModelScope.launch {
+            listenForModuleResponse()
+        }
+        viewModelScope.launch {
             listenForResponse()
         }
     }
@@ -75,6 +86,16 @@ class LoginViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    private suspend fun listenForModuleResponse() {
+        getModuleRepository.data.collect {
+            Log.i("TAG_RESPONSE", "listenForModuleResponse: $it")
+            _moduleResponse.postValue(it)
+        }
+    }
+
+    fun getModuleResponse() {
+        getModuleRepository.sendFetchingDeviceInfo()
+    }
 
     fun getLoginResponse() {
         viewModelScope.launch {

@@ -38,6 +38,7 @@ object ApiUrl {
     val bleSubscriptionStatus = Pair("$BASE_URL/RegistrationCumAllotment/bleSubscriptionStatus/", 5)
     val bleStatusCheck = Pair("$BASE_URL/RegistrationCumAllotment/bleStatusCheck/", 6)
     val saveDevInfoReg = Pair("$BASE_URL/RegistrationCumAllotment/savePersonDeviceRegistration/", 7)
+    val moduleApp = Pair("$BASE_URL/BLE_ProjectV6_2/resources/getAllModels/", 8)
     const val loginProjectName = "RegistrationCumAllotment"
 }
 
