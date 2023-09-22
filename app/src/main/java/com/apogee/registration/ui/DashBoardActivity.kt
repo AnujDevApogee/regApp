@@ -30,9 +30,6 @@ class DashBoardActivity : AppCompatActivity(){
                 showBluetoothEnableDialog()
             }
         }
-        setUpDialogBox("Information", "This App Version is Only valid for Protocol Version 3.3", "OK", success = {
-
-        }, cancelListener = {})
     }
 
     override fun onStart() {
