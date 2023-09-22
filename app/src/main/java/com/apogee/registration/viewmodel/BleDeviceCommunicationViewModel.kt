@@ -1,6 +1,7 @@
 package com.apogee.registration.viewmodel
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.apogee.registration.instance.BluetoothCommunication
@@ -10,6 +11,7 @@ import com.apogee.registration.repository.BleStatusCheckRepository
 import com.apogee.registration.repository.BleSubscriptionStatusRepository
 import com.apogee.registration.repository.DeviceRegRepository
 import com.apogee.registration.repository.DeviceRegistrationConfirmRepository
+import com.apogee.registration.repository.ModuleRegistrationDetail
 import com.apogee.registration.repository.SavePersonDeviceRegistrationRepository
 import com.apogee.registration.repository.SubSubscriptionDateRepository
 import com.apogee.registration.utils.DataResponse
@@ -17,6 +19,8 @@ import com.apogee.registration.utils.newline_crlf
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class BleDeviceCommunicationViewModel(application: Application) : AndroidViewModel(application) {
@@ -53,6 +57,10 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
         get() = _savePersonCheckResponse
 
 
+    private val _moduleRegistrationResponse = MutableStateFlow<Pair<List<String>,List<String>>?>(null)
+    val moduleRegistrationResponse: StateFlow<Pair<List<String>,List<String>>?>
+        get() = _moduleRegistrationResponse
+
     private val deviceConnectionRepo = BleDeviceCommunicationRepository(
         BluetoothCommunication.getInstance(application), application
     )
@@ -71,6 +79,8 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
 
     private val savePersonDeviceRegistrationRepository = SavePersonDeviceRegistrationRepository()
 
+
+    private val moduleRegistrationDetail=ModuleRegistrationDetail(application)
 
     init {
         bleCommunication()
@@ -97,6 +107,19 @@ class BleDeviceCommunicationViewModel(application: Application) : AndroidViewMod
     fun setUpConnection() {
         deviceConnectionRepo.setUpConnection()
     }
+
+
+
+
+    fun getBleModuleResponse(){
+        viewModelScope.launch {
+            moduleRegistrationDetail.getModuleDataResponse().collectLatest{
+                Log.i("MODULE_INFO", "getBleModuleResponse: $it")
+                _moduleRegistrationResponse.value=it
+            }
+        }
+    }
+
 
     // deviceRegRecords API
     fun sendDeviceReg(deviceRegModel: DeviceRegModel) {

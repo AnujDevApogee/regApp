@@ -77,7 +77,10 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         displayActionBar(
             getString(R.string.ble_reg), binding.actionLayout, bckIc = R.drawable.ic_back_arrow
         )
-        setupUI()
+
+        viewModel.getBleModuleResponse()
+        getModuleDataResponse()
+
 
         getBleUpdates()
         getDeviceRegResponse()
@@ -149,6 +152,18 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         }
 
 
+    }
+
+    private fun getModuleDataResponse() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.moduleRegistrationResponse.collect {
+                    if (it != null) {
+                        setupUI(it.first,it.second)
+                    }
+                }
+            }
+        }
     }
 
     private fun getSavePersonResponse() {
@@ -629,16 +644,18 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
         }
     }
 
-    private fun setupUI() {
+    private fun setupUI(modelName: List<String>, modelNo: List<String>) {
         binding.bleNme.setText(args.devicename)
 
+        //resources.getStringArray(R.array.model_ls) moduleNo
+        //resources.getStringArray(R.array.model_name_ls) modelName
 
-        val modelAndNo=BleProtocolFilter.getModelNameAndNumber(args.devicename,requireContext())
+        val modelAndNo = BleProtocolFilter.getModelNameAndNumber(args.devicename,modelName,modelNo)
 
         binding.subscriptionDate.setText(getDate(getTimeStamp().timeInMillis))
         binding.modelNo.apply {
-            setText(resources.getStringArray(R.array.model_ls)[modelAndNo.second].toString())
-            setAdapter(setAdaptor(R.array.model_ls))
+            setText(modelNo[modelAndNo.second])
+            setAdapter(setAdaptor(modelNo))
         }
         binding.deviceLs.apply {
             setText(resources.getStringArray(R.array.device_ls)[0].toString())
@@ -649,8 +666,8 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             setAdapter(setAdaptor(R.array.manufact_ls))
         }
         binding.modelNameLs.apply {
-            setText(resources.getStringArray(R.array.model_name_ls)[modelAndNo.first].toString())
-            setAdapter(setAdaptor(R.array.model_name_ls))
+            setText(modelName[modelAndNo.first])
+            setAdapter(setAdaptor(modelName))
         }
         binding.subscriptionDate.setOnClickListener {
             if (calenderFlag) {
@@ -668,6 +685,14 @@ class DeviceRegistrationFragment : Fragment(R.layout.device_registration_layout)
             this.requireContext(),
             android.R.layout.select_dialog_item,
             resources.getStringArray(strAdp)
+        )
+    }
+
+    private fun setAdaptor(strAdp: List<String>): ArrayAdapter<String> {
+        return ArrayAdapter<String>(
+            this.requireContext(),
+            android.R.layout.select_dialog_item,
+            strAdp
         )
     }
 

@@ -1,6 +1,5 @@
 package com.apogee.registration.user_case
 
-import android.content.Context
 import com.apogee.registration.R
 
 class BleProtocolFilter {
@@ -63,9 +62,7 @@ class BleProtocolFilter {
         }
 
 
-        fun getModelNameAndNumber(device: String, context: Context): Pair<Int, Int> {
-            val modelNo = context.resources.getStringArray(R.array.model_ls)
-            val modelName = context.resources.getStringArray(R.array.model_name_ls)
+        fun getModelNameAndNumber(device: String, modelName: List<String>, modelNo: List<String>): Pair<Int, Int> {
             var indexNo = 0
             var indexName = 0
             val deviceName=device.split("-".toRegex()).first()
